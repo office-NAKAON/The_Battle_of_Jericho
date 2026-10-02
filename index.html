@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ジェリコの戦い｜10月25日の合唱コンクール</title>
-  <meta name="description" content="中学2年の合唱コンクールに向けた『ジェリコの戦い』のページ。物語、歌の二つの意味、歌い方、パートの役割、本番までのミッション。">
+  <meta name="description" content="中学2年の合唱コンクールに向けた『ジェリコの戦い』のページ。物語、歌の二つの意味、伝承の歌詞と日本語訳、歌い方、パートの役割、本番までのミッション。">
   <style>
     :root {
       --night: #070b14;
@@ -275,6 +275,39 @@
       line-height: 1.65;
     }
 
+    .lyrics { background: #14110e; }
+    .stanzas { margin: 1.35rem 0 0; display: grid; gap: 0.9rem; }
+    .stanza {
+      background: var(--panel);
+      padding: 1.05rem 1.1rem 1.15rem;
+      border-top: 3px solid var(--sand);
+    }
+    .stanza h3 {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+    }
+    .stanza .label {
+      margin: 0.8rem 0 0.15rem;
+      color: var(--sand);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+    }
+    .en {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: 1.22rem;
+      line-height: 1.65;
+    }
+    .ja {
+      margin: 0.15rem 0 0;
+      color: var(--sand-2);
+    }
+    .word-notes { margin: 1.15rem 0 0; padding-left: 1.15rem; }
+    .word-notes li + li { margin-top: 0.4rem; }
+
     .scene-list { list-style: none; margin: 1.3rem 0 0; padding: 0; display: grid; gap: 0.9rem; }
     .scene {
       background: var(--panel);
@@ -487,6 +520,7 @@
   <nav class="jump" aria-label="ページ内">
     <a href="#story">物語</a>
     <a href="#futatsu">二つの意味</a>
+    <a href="#kashi">歌詞</a>
     <a href="#drama">歌い方</a>
     <a href="#parts">パート</a>
     <a href="#kabe">私たちの壁</a>
@@ -571,11 +605,56 @@
       </div>
     </section>
 
+    <section class="lyrics" id="kashi">
+      <div class="wrap">
+        <p class="kicker">口にする言葉</p>
+        <h2>歌詞と日本語訳</h2>
+        <p class="intro">アメリカに伝わる英語の詞です。作者の名前は残っていません。下の日本語は、このページのために訳しました。クラスの楽譜とは、単語が少し違うことがあります。くり返しは、節と節のあいだでもう一度歌います。奥の意味は、<a href="#futatsu">二つの意味</a>に書いてあります。ここにある日本語は、言葉をそのまま読んだときの意味です。</p>
+        <div class="stanzas">
+          <article class="stanza">
+            <h3>くり返し</h3>
+            <p class="label">英語</p>
+            <p class="en" lang="en">Joshua fit the battle of Jericho,<br>Jericho, Jericho,<br>Joshua fit the battle of Jericho,<br>And the walls came tumbling down.</p>
+            <p class="label">日本語</p>
+            <p class="ja">ヨシュアは、ジェリコで戦った。<br>ジェリコ、ジェリコ。<br>ヨシュアは、ジェリコで戦った。<br>そして、城壁は崩れ落ちた。</p>
+          </article>
+          <article class="stanza">
+            <h3>1　だれと比べても</h3>
+            <p class="label">英語</p>
+            <p class="en" lang="en">You may talk about your king of Gideon,<br>You may talk about your man of Saul,<br>There's none like good old Joshua<br>At the battle of Jericho.</p>
+            <p class="label">日本語</p>
+            <p class="ja">ギデオンの王のことを語ってもよい。<br>サウルの家来のことを語ってもよい。<br>それでもジェリコの戦いでは、<br>あのヨシュアほど心強い人はいない。</p>
+          </article>
+          <article class="stanza">
+            <h3>2　城壁の前まで</h3>
+            <p class="label">英語</p>
+            <p class="en" lang="en">Up to the walls of Jericho<br>He marched with spear in hand.<br>“Go blow them ram horns,” Joshua cried,<br>“'Cause the battle is in my hand.”</p>
+            <p class="label">日本語</p>
+            <p class="ja">ジェリコの城壁のすぐ前まで、<br>彼は槍を手に進んでいった。<br>「角笛を吹くのだ」と、ヨシュアは叫んだ。<br>「この戦いは、わたしの手のうちにある。」</p>
+          </article>
+          <article class="stanza">
+            <h3>3　声を上げるとき</h3>
+            <p class="label">英語</p>
+            <p class="en" lang="en">Then the lamb, ram, sheep horns begin to blow,<br>The trumpets begin to sound.<br>Joshua commanded the children to shout,<br>And the walls came tumbling down.</p>
+            <p class="label">日本語</p>
+            <p class="ja">やがて、羊の角で作った笛が鳴り始めた。<br>ラッパも鳴り響いた。<br>ヨシュアは、ともに来た人々に声を上げよと命じた。<br>そして、城壁は崩れ落ちた。</p>
+          </article>
+        </div>
+        <ul class="word-notes">
+          <li><b>fit</b> は、fought（戦った）にあたる古い言い方です。楽譜によっては fought と印刷されています。</li>
+          <li><b>good old</b> は、親しみと尊敬をこめた呼び方です。</li>
+          <li>ギデオンとサウルは、聖書に出てくる有名な人物です。この節は、その人たちの話をしても、ジェリコではヨシュアに及ばない、と言っています。</li>
+          <li><b>lamb, ram, sheep horns</b> は、羊の角で作った笛を、言葉を重ねて歌っています。このページでは角笛と呼んでいます。</li>
+          <li><b>children</b> は、今の「子ども」だけを指す言葉ではありません。ヨシュアについてきた人々のことです。</li>
+        </ul>
+      </div>
+    </section>
+
     <section id="drama">
       <div class="wrap">
         <p class="kicker">聴きどころ</p>
         <h2>歌の中のドラマ</h2>
-        <p class="intro">音源と楽譜は、準備できてから、このページに追加します。今は、歌の流れを頭の中でたどります。強弱は、練習で決めます。正解はないので、歌いたい声を一つ選んでください。選んだものは、このスマホやパソコンに残ります。</p>
+        <p class="intro">音源と楽譜は、準備できてから追加します。言葉そのものは、<a href="#kashi">歌詞</a>にあります。ここでは、歌の流れをたどります。強弱は、練習で決めます。正解はないので、歌いたい声を一つ選んでください。選んだものは、このスマホやパソコンに残ります。</p>
         <ol class="scene-list">
           <li class="scene">
             <h3>1　始まり　近づいてくる足音</h3>
@@ -742,7 +821,7 @@
 
   <footer>
     <div class="wrap">
-      <p>中学2年の合唱コンクールのために作ったページです。曲は、アフリカ系アメリカ人のスピリチュアル “Joshua Fit the Battle of Jericho”（ジェリコの戦い）です。音源と楽譜は、準備できてから追加します。二つの意味の説明は、アメリカの国立公園局 “Freedom Is Coming” Lesson 5 を、中学生向けに短くしたものです。</p>
+      <p>中学2年の合唱コンクールのために作ったページです。曲は、アフリカ系アメリカ人のスピリチュアル “Joshua Fit the Battle of Jericho”（ジェリコの戦い）です。歌詞の英語は、作者不明の伝承詞です。日本語訳は、このページのために書いたもので、クラスの楽譜に載っている訳文とは別の文章です。音源と楽譜は、準備できてから追加します。二つの意味の説明は、アメリカの国立公園局 “Freedom Is Coming” Lesson 5 を、中学生向けに短くしたものです。</p>
     </div>
   </footer>
 
