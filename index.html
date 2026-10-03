@@ -161,6 +161,52 @@
       margin: 1.15rem 0 0;
     }
     .sources .btn { margin-top: 0; }
+    .deck {
+      margin-top: 1.15rem;
+      background: #0c111c;
+      border: 1px solid var(--line);
+      scroll-margin-top: 4.2rem;
+    }
+    .deck figure { margin: 0; }
+    .deck img { width: 100%; height: auto; box-shadow: none; background: #1a1208; }
+    .deck figcaption {
+      margin: 0;
+      padding: 0 1rem 0.65rem;
+      color: var(--gold);
+      font-weight: 800;
+    }
+    .deck-nav {
+      position: sticky;
+      top: 3.6rem;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 0.55rem;
+      align-items: center;
+      padding: 0.7rem 0.75rem 0.85rem;
+      background: rgba(12, 17, 28, 0.96);
+    }
+    .deck-nav button {
+      min-height: 3rem;
+      padding: 0.55rem 0.8rem;
+      background: transparent;
+      color: var(--gold);
+      border: 1px solid var(--line);
+      font-family: inherit;
+      font-size: 1.02rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .deck-nav .next { justify-self: end; }
+    .deck-nav button:hover { background: rgba(240, 212, 138, 0.1); }
+    .deck-nav button:disabled { opacity: 0.35; cursor: default; }
+    .deck-nav p {
+      margin: 0;
+      min-width: 4.2rem;
+      text-align: center;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+    }
 
     main { overflow: clip; }
     section { padding: 3.4rem 1.15rem; scroll-margin-top: 3.6rem; }
@@ -607,9 +653,19 @@
 
         <p class="accurate">スピリチュアルには、聖書の物語を歌いながら、その奥に自由や解放への願いを重ねたものがあります。このような二重の意味は、ときに歌う人たちだけが理解できる「暗号」の役割も果たしました。</p>
         <p>この歌のすべてが、逃げるための暗号だった、と決めつけることはできません。暗号がどのくらい使われたかは、今でも研究が続いています。アメリカの国立公園局の教材では、聖書の物語に、自分たちの苦しさや、自由への希望を重ねて歌っていた、と説明しています。</p>
-        <p>同じテーマを、図でたどるスライドもあります。表の物語と、歌に重ねられた意味を、順に見られます。</p>
+        <p>同じテーマを、図でたどるスライドもあります。表の物語と、歌に重ねられた意味を、この場で順に見られます。</p>
+        <div class="deck" id="slide-deck" tabindex="0" aria-label="脱出暗号のスライド">
+          <div class="deck-nav">
+            <button type="button" id="slide-prev" disabled>前へ</button>
+            <p id="slide-count">1 / 15</p>
+            <button class="next" type="button" id="slide-next">次へ</button>
+          </div>
+          <figure>
+            <figcaption id="slide-caption">歌に隠された脱出コード</figcaption>
+            <img id="slide-img" src="脱出暗号/01.jpg" width="1600" height="894" alt="崩れた石壁の割れ目から光と音符が差し込む表紙。見出しは「歌に隠された秘密の脱出コード：『ジェリコの戦い』の真実」。">
+          </figure>
+        </div>
         <p class="sources">
-          <a class="btn ghost" href="『ジェリコの戦い』の脱出暗号.pdf">脱出暗号のスライドを開く</a>
           <a href="https://www.nps.gov/teachers/classrooms/freedom-is-coming-lesson-5.htm">アメリカの国立公園局の教材を見る</a>
         </p>
         <p class="bridge">では、私たちがこの歌で越えたい「壁」は何だろう？</p>
@@ -879,6 +935,114 @@
     const stage = document.getElementById("dual-stage");
     const toggle = document.getElementById("dual-toggle");
     const depth = document.getElementById("depth-panel");
+    const slides = [
+      {
+        src: "脱出暗号/01.jpg",
+        caption: "歌に隠された脱出コード",
+        alt: "崩れた石壁の割れ目から光と音符が差し込む表紙。見出しは「歌に隠された秘密の脱出コード：『ジェリコの戦い』の真実」。"
+      },
+      {
+        src: "脱出暗号/02.jpg",
+        caption: "もう一つの意味",
+        alt: "楽譜を虫眼鏡で見る図。表向きは聖書の歴史の歌だが、歌詞の裏に命がけの暗号が隠されていた、と書かれている。"
+      },
+      {
+        src: "脱出暗号/03.jpg",
+        caption: "表の物語",
+        alt: "聖書のジェリコの戦いを4段階で示す図。指示、6日間の行進、7日目の角笛と大声、城壁の崩壊。"
+      },
+      {
+        src: "脱出暗号/04.jpg",
+        caption: "そこに壁はなかった？",
+        alt: "発掘の年表。紀元前16世紀には城壁が破壊され、紀元前13世紀にはほぼ無人の廃墟だった、という説明。"
+      },
+      {
+        src: "脱出暗号/05.jpg",
+        caption: "海を越えた物語",
+        alt: "綿畑で働く人々の影絵。物語が海を越え、プランテーションの人々が自分たちの境遇を聖書に重ねた、という説明。"
+      },
+      {
+        src: "脱出暗号/06.jpg",
+        caption: "口に出せない自由",
+        alt: "アメリカ南部の地図と監視の目。自由になりたいと口に出せば命が危ないため、宗教の歌に聞こえる二重の意味を編み出した、という説明。"
+      },
+      {
+        src: "脱出暗号/07.jpg",
+        caption: "裏コードの解読表",
+        alt: "言葉の対応表。ジェリコの城壁は奴隷制度、ヨシュアは地下鉄道の案内人、約束の地は北部やカナダ、壁が崩れるは自由の獲得、と並べている。"
+      },
+      {
+        src: "脱出暗号/08.jpg",
+        caption: "地下鉄道",
+        alt: "星空の下を歩く人々の影。地下鉄道の脱出の合図として、この歌が使われた、という説明。"
+      },
+      {
+        src: "脱出暗号/09.jpg",
+        caption: "生き抜くためのエネルギー",
+        alt: "ヨーロッパの聖歌の規則的な波形と、黒人霊歌の複雑な波形の比較。シンコペーション、ポリリズム、ブルーノート、アカペラの説明。"
+      },
+      {
+        src: "脱出暗号/10.jpg",
+        caption: "壁は崩れ落ちた",
+        alt: "金の城壁が崩れ、楽譜が光る図。and the walls came tumblin' down で旋律が一気に下がる、という説明。"
+      },
+      {
+        src: "脱出暗号/11.jpg",
+        caption: "1922年の録音",
+        alt: "蓄音機と女性参政権の旗。1922年にハロッズ・ジュビリー・シンガーズが初めて録音し、女性がリードを歌った、という説明。"
+      },
+      {
+        src: "脱出暗号/12.jpg",
+        caption: "自由の歌へ",
+        alt: "行進する人々と音波。1950年代から60年代の公民権運動で、隠された暗号から非暴力抵抗の歌へ変わった、という説明。"
+      },
+      {
+        src: "脱出暗号/13.jpg",
+        caption: "世界へ歌い継がれて",
+        alt: "世界地図。ポール・ロブスン、マハリア・ジャクソン、エルヴィス・プレスリーらに歌い継がれ、南アフリカの闘争でも歌われた、という説明。"
+      },
+      {
+        src: "脱出暗号/14.jpg",
+        caption: "歌で壁を壊す",
+        alt: "崩れる壁と金色の道。武器ではなく歌で壁を壊す、という三つのまとめ。"
+      },
+      {
+        src: "脱出暗号/15.jpg",
+        caption: "あなたの前の壁",
+        alt: "夕日の荒野と崩れた壁。あなたの前に立ちはだかる壁は何ですか、という問い。"
+      }
+    ];
+    const deck = document.getElementById("slide-deck");
+    const slideImg = document.getElementById("slide-img");
+    const slideCaption = document.getElementById("slide-caption");
+    const slideCount = document.getElementById("slide-count");
+    const slidePrev = document.getElementById("slide-prev");
+    const slideNext = document.getElementById("slide-next");
+    let slideIndex = 0;
+    const showSlide = (nextIndex) => {
+      slideIndex = Math.max(0, Math.min(slides.length - 1, nextIndex));
+      const slide = slides[slideIndex];
+      slideImg.src = slide.src;
+      slideImg.alt = slide.alt;
+      slideCaption.textContent = slide.caption;
+      slideCount.textContent = (slideIndex + 1) + " / " + slides.length;
+      slidePrev.disabled = slideIndex === 0;
+      slideNext.disabled = slideIndex === slides.length - 1;
+    };
+    slidePrev.addEventListener("click", () => showSlide(slideIndex - 1));
+    slideNext.addEventListener("click", () => showSlide(slideIndex + 1));
+    deck.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") {
+        showSlide(slideIndex - 1);
+        event.preventDefault();
+      }
+      if (event.key === "ArrowRight") {
+        showSlide(slideIndex + 1);
+        event.preventDefault();
+      }
+    });
+    showSlide(0);
+
     toggle.addEventListener("click", () => {
       const open = stage.classList.toggle("is-open");
       toggle.setAttribute("aria-expanded", String(open));
