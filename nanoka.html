@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>七日目の合図｜ジェリコの戦い</title>
+  <meta name="description" content="6日間は声を上げない。7日目、角笛のあとに声を揃えると、ジェリコの壁が崩れる。">
+  <meta name="theme-color" content="#070b14">
+  <script>
+    if (window.parent !== window) document.documentElement.classList.add("is-embedded");
+  </script>
+  <style>
+    :root {
+      --night: #070b14;
+      --panel: #161d2e;
+      --ink: #f7f2ea;
+      --sand: #c6a36a;
+      --sand-2: #ead7b4;
+      --gold: #f0d48a;
+      --line: rgba(240, 212, 138, 0.38);
+      --serif: "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100svh;
+      background: var(--night);
+      color: var(--ink);
+      font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "YuGothic", sans-serif;
+      font-size: 1.125rem;
+      line-height: 1.7;
+    }
+
+    #nanoka-game, #nanoka-game * { box-sizing: border-box; }
+    #nanoka-game { user-select: none; -webkit-user-select: none; }
+    #nanoka-game [hidden] { display: none !important; }
+    #nanoka-game :focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 3px;
+    }
+
+    #nanoka-game {
+      width: min(100%, 440px);
+      min-height: 100svh;
+      margin: 0 auto;
+      padding: 0.85rem 1.15rem 1.15rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #nanoka-game .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    #nanoka-game .kicker {
+      margin: 0;
+      color: var(--sand);
+      letter-spacing: 0.14em;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+    #nanoka-game .mute {
+      min-height: 2.75rem;
+      padding: 0.35rem 0.7rem;
+      background: transparent;
+      color: var(--sand-2);
+      border: 1px solid var(--line);
+      font: inherit;
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    #nanoka-game h1 {
+      margin: 0.35rem 0 0.45rem;
+      font-size: clamp(1.85rem, 7vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      line-height: 1.25;
+    }
+
+    #nanoka-game .days {
+      display: flex;
+      justify-content: center;
+      gap: 0.4rem;
+      list-style: none;
+      margin: 0.15rem 0 0.35rem;
+      padding: 0;
+    }
+    #nanoka-game .days li {
+      width: 1.7rem;
+      height: 1.7rem;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(240, 212, 138, 0.28);
+      color: var(--sand-2);
+      font-size: 0.85rem;
+      font-weight: 800;
+    }
+    #nanoka-game .days li.now {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    #nanoka-game .days li.done {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #1a1208;
+    }
+
+    #nanoka-game .stage-wrap {
+      flex: 1 1 auto;
+      display: grid;
+      place-items: center;
+      min-height: 0;
+      padding: 0.2rem 0 0.35rem;
+    }
+    #nanoka-game .orbit {
+      position: relative;
+      width: min(72vw, 280px, 40svh);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 54%, rgba(198, 163, 106, 0.1), transparent 48%),
+        #0c111c;
+    }
+    #nanoka-game[data-phase="horn"] .orbit {
+      box-shadow: 0 0 0 6px rgba(240, 212, 138, 0.16), 0 0 36px rgba(240, 212, 138, 0.22);
+    }
+    #nanoka-game .ring {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    #nanoka-game .ring-bg {
+      fill: none;
+      stroke: rgba(240, 212, 138, 0.22);
+      stroke-width: 1.6;
+    }
+    #nanoka-game .ring-fg {
+      fill: none;
+      stroke: var(--gold);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+    }
+    #nanoka-game .walker {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+    }
+    #nanoka-game .walker span {
+      position: absolute;
+      left: 50%;
+      width: 0.7rem;
+      height: 0.7rem;
+      margin-left: -0.35rem;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 10px rgba(240, 212, 138, 0.85);
+    }
+    #nanoka-game .walker span:nth-child(1) { top: 1.5%; }
+    #nanoka-game .walker span:nth-child(2) {
+      top: 6.5%;
+      width: 0.55rem;
+      height: 0.55rem;
+      margin-left: -1.05rem;
+    }
+    #nanoka-game .walker span:nth-child(3) {
+      top: 6.5%;
+      width: 0.55rem;
+      height: 0.55rem;
+      margin-left: 0.48rem;
+    }
+    #nanoka-game .city {
+      position: absolute;
+      z-index: 1;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 62%;
+      padding: 0.55rem 0.45rem 0.5rem;
+      background: #14110e;
+      border: 1px solid rgba(240, 212, 138, 0.28);
+      pointer-events: none;
+    }
+    #nanoka-game .glow {
+      position: absolute;
+      z-index: 0;
+      left: 8%;
+      right: 8%;
+      top: 18%;
+      bottom: -10%;
+      background: radial-gradient(ellipse at center, rgba(240, 212, 138, 0.95), rgba(240, 212, 138, 0.15) 46%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.5s ease 0.12s;
+    }
+    #nanoka-game .city.fallen .glow { opacity: 1; }
+    #nanoka-game .city-name,
+    #nanoka-game .lap {
+      position: relative;
+      z-index: 1;
+      margin: 0 0 0.3rem;
+      text-align: center;
+      color: var(--gold);
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      font-size: 0.82rem;
+    }
+    #nanoka-game .lap {
+      font-family: var(--serif);
+      font-size: 1.85rem;
+      font-weight: 600;
+      letter-spacing: 0;
+      line-height: 1.15;
+    }
+    #nanoka-game .blocks {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 3px;
+    }
+    #nanoka-game .blocks span {
+      height: 2.55rem;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 42%),
+        linear-gradient(180deg, #c3a06d, #8a6843);
+      transform-origin: center bottom;
+      transition: transform 0.55s ease, opacity 0.55s ease;
+    }
+    #nanoka-game .city.fallen .blocks span { opacity: 0.28; }
+    #nanoka-game .city.fallen .blocks span:nth-child(1) { transform: translate(-10px, 14px) rotate(-14deg); }
+    #nanoka-game .city.fallen .blocks span:nth-child(2) { transform: translate(-4px, 18px) rotate(-6deg); transition-delay: 0.06s; }
+    #nanoka-game .city.fallen .blocks span:nth-child(3) { transform: translate(0, 22px) rotate(4deg); transition-delay: 0.1s; }
+    #nanoka-game .city.fallen .blocks span:nth-child(4) { transform: translate(6px, 16px) rotate(9deg); transition-delay: 0.14s; }
+    #nanoka-game .city.fallen .blocks span:nth-child(5) { transform: translate(12px, 12px) rotate(15deg); transition-delay: 0.18s; }
+    #nanoka-game .horn-word {
+      position: absolute;
+      z-index: 4;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      margin: 0;
+      color: var(--gold);
+      font-family: var(--serif);
+      font-size: clamp(2rem, 8vw, 2.6rem);
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      line-height: 1.15;
+      text-shadow: 0 0 18px rgba(240, 212, 138, 0.45);
+      pointer-events: none;
+    }
+
+    #nanoka-game .readout { min-height: 3.3em; }
+    #nanoka-game[data-phase="title"] .readout { min-height: 0; }
+    #nanoka-game .blurb {
+      margin: 0;
+      color: var(--sand-2);
+      font-size: 1.05rem;
+      line-height: 1.75;
+    }
+    #nanoka-game .status {
+      margin: 0;
+      color: var(--gold);
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      line-height: 1.55;
+    }
+    #nanoka-game .quote {
+      margin: 0.35rem 0 0;
+      font-family: var(--serif);
+      font-size: 1.28rem;
+      font-weight: 600;
+      line-height: 1.7;
+    }
+
+    #nanoka-game .bottom { margin-top: 0.15rem; }
+    #nanoka-game .meter-slot {
+      min-height: 4.8rem;
+      padding-top: 0.35rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    #nanoka-game[data-phase="title"] .meter-slot,
+    #nanoka-game[data-phase="win"] .meter-slot { min-height: 0; padding-top: 0; }
+    #nanoka-game .slot-hint {
+      margin: 0;
+      text-align: center;
+      color: var(--sand-2);
+      font-weight: 800;
+    }
+    #nanoka-game .meter { display: grid; gap: 0.35rem; }
+    #nanoka-game .track {
+      position: relative;
+      height: 1.35rem;
+      background: #070b14;
+      border: 1px solid var(--line);
+      overflow: visible;
+    }
+    #nanoka-game .zone {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      background: rgba(240, 212, 138, 0.55);
+    }
+    #nanoka-game .zone::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      margin-left: -1px;
+      background: rgba(26, 18, 8, 0.35);
+    }
+    #nanoka-game .marker {
+      position: absolute;
+      left: 0;
+      top: -0.35rem;
+      bottom: -0.35rem;
+      width: 0.35rem;
+      margin-left: -0.175rem;
+      background: #fff8e8;
+      box-shadow: 0 0 12px rgba(240, 212, 138, 0.95);
+    }
+    #nanoka-game .marker.is-miss {
+      background: var(--sand-2);
+      box-shadow: none;
+    }
+    #nanoka-game .meter-labels {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      margin: 0;
+      color: var(--sand-2);
+      font-size: 0.85rem;
+      font-weight: 800;
+    }
+    #nanoka-game .meter-labels span:nth-child(2) { text-align: center; color: var(--gold); }
+    #nanoka-game .meter-labels span:nth-child(3) { text-align: right; }
+
+    #nanoka-game .actions { display: grid; gap: 0.45rem; }
+    #nanoka-game button.action,
+    #nanoka-game button.text,
+    #nanoka-game .mute { touch-action: manipulation; }
+    #nanoka-game button.action {
+      width: 100%;
+      min-height: 3.2rem;
+      padding: 0.7rem 0.9rem;
+      border: 1px solid var(--gold);
+      font: inherit;
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+    }
+    #nanoka-game button.action.primary { background: var(--gold); color: #1a1208; }
+    #nanoka-game button.action.ghost { background: transparent; color: var(--gold); }
+    #nanoka-game button.action:disabled { opacity: 0.35; cursor: default; }
+    #nanoka-game button.text {
+      justify-self: center;
+      min-height: 2.75rem;
+      padding: 0.35rem 0.4rem;
+      background: none;
+      border: 0;
+      color: var(--sand-2);
+      font: inherit;
+      font-size: 1rem;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    #nanoka-game .back {
+      margin: 0.55rem 0 0;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+    #nanoka-game .back a,
+    #nanoka-game .back a:visited { color: var(--gold); }
+
+    @media (hover: hover) {
+      #nanoka-game button.action.primary:hover:not(:disabled) { background: #ffe3a3; }
+      #nanoka-game button.action.ghost:hover:not(:disabled),
+      #nanoka-game .mute:hover { background: rgba(240, 212, 138, 0.1); }
+    }
+    @media (min-width: 800px) {
+      #nanoka-game { width: min(100%, 520px); padding-top: 1.1rem; }
+      #nanoka-game .orbit { width: min(320px, 40svh); }
+    }
+    html.is-embedded body,
+    html.is-embedded #nanoka-game {
+      min-height: 100%;
+      height: 100%;
+    }
+    html.is-embedded #nanoka-game { padding-top: 0.7rem; padding-bottom: 0.75rem; }
+    html.is-embedded #nanoka-game .back { display: none; }
+    html.is-embedded #nanoka-game .orbit { width: min(68vw, 260px, 32svh); }
+    html.is-embedded #nanoka-game .readout { min-height: 2.8em; }
+    html.is-embedded #nanoka-game .meter-slot { min-height: 4.1rem; }
+
+    @media (prefers-reduced-motion: reduce) {
+      #nanoka-game .blocks span,
+      #nanoka-game .glow { transition: none; }
+      #nanoka-game[data-phase="horn"] .orbit { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <main id="nanoka-game" data-phase="title">
+    <div class="top">
+      <p class="kicker">ジェリコの戦い</p>
+      <button class="mute" id="mute" type="button" aria-pressed="false">音を消す</button>
+    </div>
+    <h1>七日目の合図</h1>
+    <ol class="days" id="days" hidden aria-label="七日の進み">
+      <li>1</li><li>2</li><li>3</li><li>4</li><li>5</li><li>6</li><li>7</li>
+    </ol>
+    <div class="stage-wrap">
+      <div class="orbit" id="orbit">
+        <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+          <circle class="ring-bg" cx="50" cy="50" r="46"></circle>
+          <circle class="ring-fg" id="arc" cx="50" cy="50" r="46" transform="rotate(-90 50 50)"></circle>
+        </svg>
+        <div class="city" id="city">
+          <div class="glow"></div>
+          <p class="city-name" id="city-name">ジェリコ</p>
+          <p class="lap" id="lap" hidden aria-hidden="true">1</p>
+          <div class="blocks" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+        </div>
+        <div class="walker" id="walker" aria-hidden="true"><span></span><span></span><span></span></div>
+        <p class="horn-word" id="horn-word" hidden>角笛</p>
+      </div>
+    </div>
+    <div class="readout" aria-live="polite" aria-atomic="true">
+      <p class="blurb" id="blurb">6日間は、声を上げずに町を一周する。7日目は七周して、角笛を待つ。角笛のあと、光が金色の帯に重なったら、声を揃える。早すぎても、遅すぎても、壁は残る。</p>
+      <p class="status" id="message" hidden></p>
+      <p class="quote" id="quote" hidden>一人の大声ではない。<br>同じ瞬間に重なった声で、壁は落ちた。</p>
+    </div>
+    <div class="bottom">
+      <div class="meter-slot">
+        <p class="slot-hint" id="hint" hidden aria-hidden="true"></p>
+        <div class="meter" id="meter" hidden>
+          <div class="track">
+            <div class="zone" id="zone"></div>
+            <div class="marker" id="marker"></div>
+          </div>
+          <p class="meter-labels"><span>早い</span><span>今</span><span>遅い</span></p>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="action primary" id="act" type="button">歩き始める</button>
+        <button class="text" id="restart" type="button" hidden>最初から歩く</button>
+      </div>
+      <p class="back"><a href="index.html#story" target="_top">物語のページへ</a></p>
+    </div>
+  </main>
+  <noscript><p>このゲームは、スクリプトをオンにして遊べます。</p></noscript>
+  <script>
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const AIM_MS = 2400;
+    const GOLD_START = 0.37;
+    const GOLD_END = 0.63;
+    const PERFECT_START = 0.46;
+    const PERFECT_END = 0.54;
+    const QUIET_LAP_MS = reduceMotion ? 420 : 1300;
+    const GAP_MS = reduceMotion ? 200 : 520;
+    const DAY7_LAP_MS = reduceMotion ? 320 : 740;
+    const HORN_MS = reduceMotion ? 700 : 1200;
+    const SHOUT_GRACE_MS = 300;
+
+    const app = document.getElementById("nanoka-game");
+    const days = document.getElementById("days");
+    const dayItems = Array.from(days.querySelectorAll("li"));
+    const blurb = document.getElementById("blurb");
+    const message = document.getElementById("message");
+    const quote = document.getElementById("quote");
+    const hint = document.getElementById("hint");
+    const meter = document.getElementById("meter");
+    const zone = document.getElementById("zone");
+    const marker = document.getElementById("marker");
+    const act = document.getElementById("act");
+    const restart = document.getElementById("restart");
+    const mute = document.getElementById("mute");
+    const city = document.getElementById("city");
+    const cityName = document.getElementById("city-name");
+    const lap = document.getElementById("lap");
+    const walker = document.getElementById("walker");
+    const hornWord = document.getElementById("horn-word");
+    const arc = document.getElementById("arc");
+
+    let arcLength = arc.getTotalLength();
+    if (!arcLength) arcLength = 2 * Math.PI * 46;
+    arc.style.strokeDasharray = arcLength + " " + arcLength;
+
+    zone.style.left = (GOLD_START * 100) + "%";
+    zone.style.width = ((GOLD_END - GOLD_START) * 100) + "%";
+
+    let phase = "title";
+    let day = 1;
+    let cleared = 0;
+    let runId = 0;
+    let timer = 0;
+    let marchRaf = 0;
+    let aimRaf = 0;
+    let aimElapsed = 0;
+    let aimLast = 0;
+    let shoutReadyAt = 0;
+    let soundOn = true;
+    let audioCtx = null;
+    let activeNodes = [];
+
+    function setMessage(text) {
+      if (message.textContent === text) return;
+      message.textContent = text;
+    }
+
+    function setAngle(deg) {
+      const turn = ((deg % 360) + 360) % 360;
+      walker.style.transform = "rotate(" + turn + "deg)";
+      const shown = turn === 0 && deg > 0 ? 1 : turn / 360;
+      arc.style.strokeDashoffset = String(arcLength * (1 - shown));
+    }
+
+    function paintDays() {
+      dayItems.forEach((item, index) => {
+        const n = index + 1;
+        const done = phase === "win" || n <= cleared;
+        const now = !done && n === day && phase !== "title";
+        item.classList.toggle("done", done);
+        item.classList.toggle("now", now);
+        if (now) item.setAttribute("aria-current", "step");
+        else item.removeAttribute("aria-current");
+      });
+    }
+
+    function focusAct() {
+      act.focus({ preventScroll: true });
+    }
+
+    function render() {
+      app.dataset.phase = phase;
+      const title = phase === "title";
+      blurb.hidden = !title;
+      message.hidden = title;
+      quote.hidden = phase !== "win";
+      days.hidden = title;
+      hornWord.hidden = phase !== "horn";
+      meter.hidden = phase !== "aim" && phase !== "aimfail";
+      restart.hidden = phase !== "aimfail";
+
+      const showLap = phase === "march" && day >= 7;
+      lap.hidden = !showLap;
+      cityName.hidden = showLap;
+      city.hidden = phase === "horn";
+
+      let hintText = "";
+      if (phase === "march" && day < 7) hintText = "声を上げるのは、7日目。";
+      else if (phase === "between") hintText = "次の日へ。";
+      else if (phase === "ready" || (phase === "march" && day >= 7)) hintText = "声を上げるのは、角笛のあと。";
+      else if (phase === "horn") hintText = "鳴り終わるまで、待つ。";
+      hint.hidden = !hintText || phase === "aim" || phase === "aimfail" || title || phase === "win";
+      if (hintText) hint.textContent = hintText;
+
+      const action = actionFor(phase, day);
+      act.textContent = action.label;
+      act.disabled = !action.enabled;
+      act.dataset.mode = action.mode;
+      act.classList.toggle("primary", action.style === "primary");
+      act.classList.toggle("ghost", action.style === "ghost");
+      paintDays();
+    }
+
+    function actionFor(current) {
+      if (current === "title") return { label: "歩き始める", mode: "start", style: "primary", enabled: true };
+      if (current === "dayfail") return { label: "この日をもう一度", mode: "retry-day", style: "primary", enabled: true };
+      if (current === "ready") return { label: "七周する", mode: "day7", style: "primary", enabled: true };
+      if (current === "aim") return { label: "声を上げる", mode: "aim", style: "primary", enabled: true };
+      if (current === "aimfail") return { label: "角笛をもう一度", mode: "retry-horn", style: "primary", enabled: true };
+      if (current === "win") return { label: "もう一度歩く", mode: "again", style: "primary", enabled: true };
+      if (current === "horn" || current === "between") return { label: "声を上げる", mode: "none", style: "ghost", enabled: false };
+      if (current === "march") return { label: "声を上げる", mode: "early", style: "ghost", enabled: true };
+      return { label: "声を上げる", mode: "none", style: "ghost", enabled: false };
+    }
+
+    function setPhase(next) {
+      phase = next;
+      render();
+    }
+
+    function stopSound() {
+      activeNodes.forEach((node) => {
+        try { node.stop(); } catch (error) { /* 鳴り終わっている */ }
+      });
+      activeNodes = [];
+    }
+
+    function cancelFlows() {
+      runId += 1;
+      cancelAnimationFrame(marchRaf);
+      cancelAnimationFrame(aimRaf);
+      clearTimeout(timer);
+      stopSound();
+    }
+
+    function getCtx() {
+      const Audio = window.AudioContext || window.webkitAudioContext;
+      if (!Audio) return null;
+      if (!audioCtx) audioCtx = new Audio();
+      return audioCtx;
+    }
+
+    function unlockAudio() {
+      const ctx = getCtx();
+      if (ctx && ctx.state === "suspended") ctx.resume();
+    }
+
+    function playHorn() {
+      if (!soundOn) return;
+      const ctx = getCtx();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const filter = ctx.createBiquadFilter();
+      const gain = ctx.createGain();
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(1400, now);
+      filter.frequency.exponentialRampToValueAtTime(480, now + 0.55);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.12, now + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.72);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+      [392, 587].forEach((freq, index) => {
+        const osc = ctx.createOscillator();
+        osc.type = index === 0 ? "sawtooth" : "triangle";
+        osc.frequency.setValueAtTime(freq, now);
+        osc.frequency.exponentialRampToValueAtTime(freq / 2, now + 0.55);
+        osc.connect(filter);
+        osc.start(now);
+        osc.stop(now + 0.75);
+        activeNodes.push(osc);
+      });
+    }
+
+    function playChord() {
+      if (!soundOn) return;
+      const ctx = getCtx();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      [196, 247, 294].forEach((freq) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.05, now + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.9);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.95);
+        activeNodes.push(osc);
+      });
+    }
+
+    function animateTurns({ turns, ms, id, onDone }) {
+      let last = performance.now();
+      let elapsed = 0;
+      let lastLap = 0;
+      const frame = (now) => {
+        if (id !== runId) return;
+        elapsed += Math.min(48, now - last);
+        last = now;
+        const t = Math.min(1, elapsed / ms);
+        const angle = 360 * turns * t;
+        setAngle(angle);
+        if (turns > 1) {
+          const lapNo = Math.min(turns, Math.floor(angle / 360) + 1);
+          if (lapNo !== lastLap) {
+            lastLap = lapNo;
+            lap.textContent = String(lapNo);
+          }
+        }
+        if (t < 1) marchRaf = requestAnimationFrame(frame);
+        else onDone();
+      };
+      marchRaf = requestAnimationFrame(frame);
+    }
+
+    function beginQuiet(from) {
+      cancelFlows();
+      const id = runId;
+      day = from;
+      if (from === 1) cleared = 0;
+      city.classList.remove("fallen");
+      marker.classList.remove("is-miss");
+      setAngle(0);
+      const step = () => {
+        if (id !== runId) return;
+        if (day > 6) {
+          showDay7();
+          return;
+        }
+        shoutReadyAt = performance.now() + SHOUT_GRACE_MS;
+        setPhase("march");
+        setMessage(day === 1
+          ? "1日目。静かに一周。声のボタンは、まだ押さない。"
+          : day + "日目。静かに歩いている。");
+        animateTurns({
+          turns: 1,
+          ms: QUIET_LAP_MS,
+          id,
+          onDone() {
+            if (id !== runId) return;
+            cleared = day;
+            setPhase("between");
+            setMessage(day + "日目は、静かに終えた。");
+            timer = window.setTimeout(() => {
+              if (id !== runId) return;
+              day += 1;
+              step();
+            }, GAP_MS);
+          }
+        });
+      };
+      step();
+    }
+
+    function showDay7() {
+      day = 7;
+      setAngle(0);
+      setPhase("ready");
+      setMessage("7日目。七周して、角笛を待て。");
+      focusAct();
+    }
+
+    function beginDay7() {
+      cancelFlows();
+      const id = runId;
+      day = 7;
+      shoutReadyAt = performance.now() + SHOUT_GRACE_MS;
+      lap.textContent = "1";
+      setPhase("march");
+      setMessage("7日目。七周している。声は、角笛のあと。");
+      animateTurns({
+        turns: 7,
+        ms: DAY7_LAP_MS * 7,
+        id,
+        onDone() {
+          if (id !== runId) return;
+          startHorn(id);
+        }
+      });
+    }
+
+    function beginHorn() {
+      cancelFlows();
+      day = 7;
+      marker.classList.remove("is-miss");
+      setAngle(360);
+      startHorn(runId);
+    }
+
+    function startHorn(id) {
+      if (id !== runId) return;
+      setPhase("horn");
+      setMessage("角笛。鳴り終わるまで待つ。");
+      playHorn();
+      timer = window.setTimeout(() => {
+        if (id !== runId) return;
+        startAim(id);
+      }, HORN_MS);
+    }
+
+    function startAim(id) {
+      if (id !== runId) return;
+      aimElapsed = 0;
+      aimLast = performance.now();
+      marker.classList.remove("is-miss");
+      marker.style.left = "0%";
+      setPhase("aim");
+      setMessage("金色の帯に、光を重ねる。");
+      focusAct();
+      const frame = (now) => {
+        if (id !== runId || phase !== "aim") return;
+        aimElapsed += Math.min(48, now - aimLast);
+        aimLast = now;
+        const t = aimElapsed / AIM_MS;
+        if (t >= 1) {
+          finishAim(1);
+          return;
+        }
+        marker.style.left = (t * 100) + "%";
+        aimRaf = requestAnimationFrame(frame);
+      };
+      aimRaf = requestAnimationFrame(frame);
+    }
+
+    function currentAimT(now) {
+      const extra = Math.max(0, Math.min(48, now - aimLast));
+      return (aimElapsed + extra) / AIM_MS;
+    }
+
+    function finishAim(t) {
+      if (phase !== "aim") return;
+      cancelAnimationFrame(aimRaf);
+      runId += 1;
+      const shown = Math.max(0, Math.min(1, t));
+      marker.style.left = (shown * 100) + "%";
+      if (t >= GOLD_START && t <= GOLD_END) {
+        const perfect = t >= PERFECT_START && t <= PERFECT_END;
+        city.classList.add("fallen");
+        cleared = 7;
+        setPhase("win");
+        setMessage(perfect ? "ぴったり、同じ瞬間だった。" : "声が揃った。壁が崩れ落ちた。");
+        playChord();
+        focusAct();
+        return;
+      }
+      marker.classList.add("is-miss");
+      setPhase("aimfail");
+      setMessage(t < GOLD_START
+        ? "早すぎた。角笛のあと、帯の真ん中で揃える。"
+        : "遅れた。ばらばらの声では、壁は残る。");
+      focusAct();
+    }
+
+    function failDay() {
+      cancelFlows();
+      setPhase("dayfail");
+      setMessage(day >= 7
+        ? "まだ角笛が鳴っていない。七周が終わるまで待つ。"
+        : "まだだ。6日間は、声を上げない。");
+      focusAct();
+    }
+
+    act.addEventListener("click", () => {
+      const mode = act.dataset.mode;
+      if (mode === "none" || act.disabled) return;
+      unlockAudio();
+      if (mode === "start" || mode === "again") beginQuiet(1);
+      else if (mode === "retry-day") {
+        if (day >= 7) beginDay7();
+        else beginQuiet(day);
+      } else if (mode === "day7") beginDay7();
+      else if (mode === "early") {
+        if (performance.now() < shoutReadyAt) return;
+        failDay();
+      } else if (mode === "aim") finishAim(currentAimT(performance.now()));
+      else if (mode === "retry-horn") beginHorn();
+    });
+
+    restart.addEventListener("click", () => {
+      unlockAudio();
+      beginQuiet(1);
+    });
+
+    mute.addEventListener("click", () => {
+      soundOn = !soundOn;
+      mute.textContent = soundOn ? "音を消す" : "音を出す";
+      mute.setAttribute("aria-pressed", String(!soundOn));
+      if (soundOn) unlockAudio();
+      else stopSound();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (phase !== "aim") return;
+      if (event.repeat) return;
+      if (event.key !== " " && event.key !== "Enter") return;
+      if (document.activeElement === act) return;
+      event.preventDefault();
+      finishAim(currentAimT(performance.now()));
+    });
+
+    setAngle(0);
+    render();
+  </script>
+</body>
+</html>

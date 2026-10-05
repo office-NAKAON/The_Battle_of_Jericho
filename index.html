@@ -514,6 +514,19 @@
       padding: 0.4rem 0;
     }
 
+    .aizu {
+      padding: 0;
+      background: #070b14;
+      scroll-margin-top: 3.6rem;
+    }
+    .aizu iframe {
+      display: block;
+      width: 100%;
+      height: calc(100svh - 3.6rem);
+      border: 0;
+      background: #070b14;
+    }
+
     .closing {
       min-height: 68vh;
       display: grid;
@@ -579,6 +592,7 @@
     <a href="#parts">パート</a>
     <a href="#kabe">私たちの壁</a>
     <a href="#mission">ミッション</a>
+    <a href="#aizu">合図</a>
   </nav>
 
   <main>
@@ -878,6 +892,10 @@
         </div>
         <button class="reset" type="button" id="reset-missions">チェックを最初にもどす</button>
       </div>
+    </section>
+
+    <section class="aizu" id="aizu">
+      <iframe src="nanoka.html" title="七日目の合図"></iframe>
     </section>
 
     <section class="closing" id="close">
