@@ -3,879 +3,286 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>七日目の合図｜ジェリコの戦い</title>
-  <meta name="description" content="6日間は声を上げない。7日目、角笛のあとに声を揃えると、ジェリコの壁が崩れる。">
+  <title>ジェリコの七日目｜ジェリコの戦い</title>
+  <meta name="description" content="歩調を揃え、角笛を聴き、三つの声を重ねてジェリコの壁を越える音楽ゲーム。">
   <meta name="theme-color" content="#070b14">
-  <script>
-    if (window.parent !== window) document.documentElement.classList.add("is-embedded");
-  </script>
+  <script>document.documentElement.classList.add("js");</script>
   <style>
     :root {
-      --night: #070b14;
-      --panel: #161d2e;
-      --ink: #f7f2ea;
-      --sand: #c6a36a;
-      --sand-2: #ead7b4;
-      --gold: #f0d48a;
-      --line: rgba(240, 212, 138, 0.38);
+      --night: #070b14; --panel: #111827; --ink: #f8f2e7; --muted: #c9bdab;
+      --sand: #c7a36a; --gold: #f4d884; --gold-2: #fff1bd;
+      --line: rgba(244,216,132,.3); --blue: #9fd7ef; --rose: #e5a6bd; --green: #a8d2a1;
       --serif: "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", serif;
+      --sans: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "YuGothic", sans-serif;
     }
-
-    body {
-      margin: 0;
-      min-height: 100svh;
-      background: var(--night);
-      color: var(--ink);
-      font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "YuGothic", sans-serif;
-      font-size: 1.125rem;
-      line-height: 1.7;
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--night); color: var(--ink); }
+    body { font-family: var(--sans); overflow-x: hidden; }
+    button { font: inherit; }
+    button:focus-visible, a:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
+    [hidden] { display: none !important; }
+    .game {
+      position: relative; isolation: isolate; width: min(100%,760px); min-height: 100svh; margin: 0 auto;
+      padding: 1rem clamp(1rem,4vw,2.2rem) 1.2rem; display: grid; grid-template-rows: auto auto 1fr auto;
+      gap: .7rem; overflow: hidden; user-select: none; -webkit-user-select: none;
+      background: radial-gradient(circle at 50% 34%,rgba(198,163,106,.13),transparent 35%),linear-gradient(180deg,#0b1220 0%,#070b14 72%);
     }
-
-    #nanoka-game, #nanoka-game * { box-sizing: border-box; }
-    #nanoka-game { user-select: none; -webkit-user-select: none; }
-    #nanoka-game [hidden] { display: none !important; }
-    #nanoka-game :focus-visible {
-      outline: 2px solid var(--gold);
-      outline-offset: 3px;
+    .game::before {
+      content: ""; position: absolute; inset: 0; z-index: -2; opacity: .24;
+      background-image: linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+      background-size: 32px 32px; mask-image: linear-gradient(to bottom,#000,transparent 75%);
     }
-
-    #nanoka-game {
-      width: min(100%, 440px);
-      min-height: 100svh;
-      margin: 0 auto;
-      padding: 0.85rem 1.15rem 1.15rem;
-      display: flex;
-      flex-direction: column;
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: .8rem; min-height: 2.5rem; }
+    .brand { margin: 0; color: var(--sand); font-size: .76rem; font-weight: 800; letter-spacing: .16em; }
+    .tool { border: 1px solid var(--line); border-radius: 999px; background: rgba(7,11,20,.56); color: var(--gold); padding: .48rem .78rem; cursor: pointer; font-size: .78rem; }
+    .progress-area { display: grid; gap: .45rem; }
+    .stage-row { display: grid; grid-template-columns: repeat(4,1fr); gap: .35rem; margin: 0; padding: 0; list-style: none; }
+    .stage-row li { position: relative; min-width: 0; padding-top: .55rem; color: #7f8793; font-size: clamp(.65rem,2.4vw,.78rem); text-align: center; white-space: nowrap; }
+    .stage-row li::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 3px; border-radius: 999px; background: #263144; }
+    .stage-row li.current { color: var(--gold-2); }
+    .stage-row li.current::before { background: var(--gold); box-shadow: 0 0 12px rgba(244,216,132,.45); }
+    .stage-row li.done { color: var(--sand); }
+    .stage-row li.done::before { background: var(--sand); }
+    .unity { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: .65rem; }
+    .unity span,.unity strong { font-size: .72rem; }
+    .unity span { color: var(--muted); } .unity strong { color: var(--gold); font-variant-numeric: tabular-nums; }
+    .unity-track { height: 6px; overflow: hidden; border-radius: 999px; background: #222c3d; }
+    .unity-fill { height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg,var(--sand),var(--gold-2)); transition: width 450ms ease; }
+    .arena { position: relative; display: grid; align-content: center; min-height: 0; }
+    .scene { display: none; width: 100%; animation: scene-in 420ms ease both; }
+    .scene.active { display: grid; }
+    @keyframes scene-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    .intro { place-items: center; text-align: center; align-content: center; gap: .85rem; padding: .4rem 0; }
+    .intro .eyebrow { margin: 0; color: var(--sand); font-size: .75rem; font-weight: 800; letter-spacing: .18em; }
+    .intro h1 { margin: 0; font-family: var(--serif); font-size: clamp(2rem,8vw,4rem); line-height: 1.08; letter-spacing: .04em; }
+    .intro .lead { margin: 0; max-width: 33rem; color: var(--muted); font-size: clamp(.88rem,3vw,1rem); line-height: 1.9; }
+    .seal { width: clamp(88px,22vw,132px); aspect-ratio: 1; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; box-shadow: inset 0 0 0 8px rgba(244,216,132,.03),0 0 42px rgba(244,216,132,.08); color: var(--gold); font-family: var(--serif); font-size: clamp(2.2rem,8vw,3.6rem); }
+    .scene-heading { text-align: center; margin-bottom: .7rem; }
+    .scene-heading .number { margin: 0 0 .2rem; color: var(--sand); font-size: .7rem; font-weight: 800; letter-spacing: .18em; }
+    .scene-heading h2 { margin: 0; font-family: var(--serif); font-size: clamp(1.35rem,5vw,2.1rem); }
+    .scene-heading p { margin: .35rem auto 0; max-width: 34rem; color: var(--muted); font-size: .82rem; line-height: 1.65; }
+    .march { align-content: center; }
+    .march-board { display: grid; grid-template-columns: minmax(150px,1fr) minmax(130px,.72fr); align-items: center; gap: clamp(.8rem,4vw,2rem); max-width: 620px; width: 100%; margin: 0 auto; }
+    .orbit { position: relative; width: min(48vw,260px); aspect-ratio: 1; justify-self: center; border: 1px solid rgba(244,216,132,.18); border-radius: 50%; box-shadow: inset 0 0 40px rgba(0,0,0,.45); }
+    .orbit::before,.orbit::after { content: ""; position: absolute; border-radius: 50%; }
+    .orbit::before { inset: 8%; border: 2px dashed rgba(244,216,132,.2); }
+    .orbit::after { inset: 29%; background: radial-gradient(circle at 50% 28%,#6d5540 0 10%,#47382d 11% 48%,#241d1a 49%); box-shadow: 0 9px 24px #000; }
+    .walker { position: absolute; inset: -5%; z-index: 2; transform: rotate(0deg); transition: transform 90ms linear; }
+    .walker::before { content: ""; position: absolute; top: 0; left: 50%; width: 15px; height: 15px; transform: translateX(-50%); border-radius: 50%; background: var(--gold-2); box-shadow: 0 0 18px var(--gold); }
+    .wall-mini { position: absolute; inset: 37% 25% 30%; z-index: 3; display: grid; grid-template-columns: repeat(3,1fr); gap: 3px; align-content: end; }
+    .wall-mini i { height: 16px; border-radius: 2px; background: linear-gradient(#c5a06b,#80613f); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); }
+    .wall-mini i:nth-child(4),.wall-mini i:nth-child(5) { transform: translateX(55%); }
+    .lap-center { position: absolute; inset: 0; z-index: 4; display: grid; place-content: center; text-align: center; pointer-events: none; }
+    .lap-center strong { font-family: var(--serif); font-size: clamp(2rem,7vw,3.4rem); line-height: 1; }
+    .lap-center span { color: var(--muted); font-size: .68rem; }
+    .beat-panel { display: grid; justify-items: center; gap: .65rem; }
+    .beat-dots { display: grid; grid-template-columns: repeat(4,12px); gap: .45rem; }
+    .beat-dots i { width: 12px; height: 12px; border-radius: 50%; background: #293548; transition: 100ms ease; }
+    .beat-dots i.on { background: var(--gold); transform: scale(1.25); box-shadow: 0 0 15px rgba(244,216,132,.65); }
+    .combo { min-height: 1.4em; margin: 0; color: var(--gold-2); font-size: .78rem; font-weight: 700; }
+    .tap-button,.primary,.horn-button,.voice-button,.final-button { border: 1px solid var(--gold); border-radius: 999px; background: var(--gold); color: #1a1208; font-weight: 900; cursor: pointer; touch-action: manipulation; box-shadow: 0 9px 28px rgba(0,0,0,.28); }
+    .primary { min-width: min(100%,230px); padding: .9rem 1.3rem; }
+    .tap-button { width: clamp(104px,28vw,150px); aspect-ratio: 1; font-size: 1.05rem; }
+    .tap-button.hit { transform: scale(.94); background: var(--gold-2); }
+    button:disabled { cursor: default; opacity: .4; }
+    .horn { align-content: center; }
+    .horn-stage { max-width: 560px; width: 100%; margin: 0 auto; text-align: center; }
+    .sequence { min-height: 2rem; display: flex; justify-content: center; gap: .45rem; margin: .6rem 0 .9rem; }
+    .sequence i { width: 10px; height: 10px; align-self: center; border: 1px solid var(--line); border-radius: 50%; background: transparent; }
+    .sequence i.filled { background: var(--gold); box-shadow: 0 0 12px rgba(244,216,132,.5); }
+    .horns { display: grid; grid-template-columns: repeat(3,1fr); gap: clamp(.45rem,2vw,.8rem); }
+    .horn-button { min-width: 0; height: clamp(100px,21vh,148px); padding: .7rem .35rem; border-radius: 18px; background: linear-gradient(180deg,#1c283a,#101827); color: var(--ink); }
+    .horn-button .icon { display: block; margin-bottom: .45rem; color: var(--gold); font-size: clamp(1.8rem,7vw,3rem); transform: rotate(-12deg); }
+    .horn-button small { display: block; color: var(--muted); font-weight: 600; }
+    .horn-button.playing { border-color: var(--gold-2); background: #3b3422; transform: translateY(-5px); box-shadow: 0 0 28px rgba(244,216,132,.24); }
+    .rounds { margin: .8rem 0 0; color: var(--sand); font-size: .76rem; }
+    .harmony { align-content: center; }
+    .lanes { display: grid; gap: .65rem; max-width: 610px; width: 100%; margin: 0 auto; }
+    .voice-lane { display: grid; grid-template-columns: 5.3rem 1fr 3.5rem; align-items: center; gap: .6rem; padding: .65rem; border: 1px solid rgba(255,255,255,.08); border-radius: 14px; background: rgba(17,24,39,.7); transition: border-color 250ms ease,opacity 250ms ease; }
+    .voice-lane.waiting { opacity: .42; } .voice-lane.current { border-color: var(--line); opacity: 1; } .voice-lane.complete { border-color: rgba(168,210,161,.48); opacity: 1; }
+    .voice-name { font-size: .75rem; font-weight: 800; }
+    .lane-track { position: relative; height: 12px; border-radius: 999px; background: #283346; overflow: visible; }
+    .lane-zone { position: absolute; left: 60%; width: 16%; top: -4px; bottom: -4px; border-radius: 999px; background: rgba(244,216,132,.28); border: 1px solid rgba(244,216,132,.55); }
+    .lane-marker { position: absolute; left: 0; top: 50%; width: 18px; height: 18px; transform: translate(-50%,-50%); border: 3px solid var(--night); border-radius: 50%; background: var(--rose); box-shadow: 0 0 13px currentColor; }
+    .voice-lane[data-voice="alto"] .lane-marker { background: var(--blue); }
+    .voice-lane[data-voice="bass"] .lane-marker { background: var(--green); }
+    .voice-lane.complete .lane-marker { left: 68% !important; background: var(--gold-2); }
+    .voice-button { padding: .56rem .2rem; background: transparent; color: var(--gold); font-size: .7rem; }
+    .voice-lane.complete .voice-button { border-color: rgba(168,210,161,.5); color: var(--green); }
+    .chord-readout { min-height: 1.6rem; margin: .75rem 0 0; text-align: center; color: var(--gold-2); font-family: var(--serif); }
+    .finale { place-items: center; align-content: center; text-align: center; gap: .75rem; }
+    .conductor { position: relative; width: min(54vw,235px); aspect-ratio: 1; display: grid; place-items: center; }
+    .cue-ring { position: absolute; inset: 0; border: 2px solid var(--line); border-radius: 50%; transform: scale(.45); opacity: .45; }
+    .cue-ring.moving { animation: breathe 2.4s cubic-bezier(.22,.75,.2,1) forwards; }
+    @keyframes breathe { 0% { transform: scale(.45); opacity:.35; } 76% { transform: scale(.94); opacity:.8; } 100% { transform: scale(1); opacity:1; border-color:var(--gold-2); box-shadow:0 0 38px rgba(244,216,132,.35); } }
+    .hand { position: relative; z-index: 2; color: var(--gold); font-size: clamp(3rem,14vw,5.5rem); transform-origin: 50% 90%; transition: transform 130ms ease; }
+    .hand.down { transform: translateY(20px) rotate(18deg); }
+    .cue-word { position: absolute; z-index: 3; bottom: 13%; margin: 0; color: var(--gold-2); font-size: 1.1rem; font-weight: 900; opacity: 0; }
+    .cue-word.show { opacity: 1; }
+    .final-button { min-width: min(82vw,310px); padding: 1rem 1.5rem; font-size: 1rem; }
+    .wall-scene { place-items: center; align-content: center; text-align: center; gap: .8rem; }
+    .wall { position: relative; width: min(76vw,390px); height: clamp(150px,28vh,225px); display: grid; grid-template-columns: repeat(5,1fr); align-content: end; gap: 5px; perspective: 700px; }
+    .wall::before { content: ""; position: absolute; inset: 20% 15% 0; z-index: -1; background: radial-gradient(circle,rgba(255,229,148,.56),transparent 65%); opacity: 0; transition: opacity 800ms ease; }
+    .wall.fallen::before { opacity: 1; }
+    .brick { height: clamp(30px,6vh,46px); border: 1px solid rgba(255,255,255,.15); border-radius: 3px; background: linear-gradient(150deg,#c39a65,#725339); box-shadow: inset 0 -5px 9px rgba(0,0,0,.18),0 5px 8px rgba(0,0,0,.26); transition: transform 900ms cubic-bezier(.2,.8,.25,1),opacity 900ms ease; }
+    .brick:nth-child(6),.brick:nth-child(16) { margin-left: 35%; }
+    .wall.fallen .brick:nth-child(5n+1) { transform: translate(-45px,36px) rotate(-26deg); opacity:.48; }
+    .wall.fallen .brick:nth-child(5n+2) { transform: translate(-18px,54px) rotate(13deg); opacity:.35; }
+    .wall.fallen .brick:nth-child(5n+3) { transform: translate(2px,66px) rotate(-8deg); opacity:.28; }
+    .wall.fallen .brick:nth-child(5n+4) { transform: translate(22px,50px) rotate(20deg); opacity:.4; }
+    .wall.fallen .brick:nth-child(5n) { transform: translate(48px,33px) rotate(29deg); opacity:.5; }
+    .result-title { margin: 0; font-family: var(--serif); font-size: clamp(1.65rem,7vw,2.7rem); }
+    .result-copy { margin: 0; color: var(--muted); font-size: .82rem; line-height: 1.7; }
+    .scores { width: min(100%,430px); display: grid; grid-template-columns: repeat(3,1fr); gap: .45rem; }
+    .score { padding: .58rem .25rem; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; background: rgba(17,24,39,.78); }
+    .score span { display:block; color:var(--muted); font-size:.66rem; } .score strong { color:var(--gold); font-size:1.05rem; font-variant-numeric:tabular-nums; }
+    .status-area { min-height: 4.8rem; display: grid; align-content: end; gap: .55rem; text-align: center; }
+    .status { min-height: 1.35em; margin: 0; color: var(--muted); font-size: .82rem; line-height: 1.5; }
+    .status.good { color: var(--gold-2); }
+    .footer-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: .55rem; }
+    .text-button,.back-link { border: 0; background: none; color: var(--sand); padding: .35rem .5rem; font-size: .75rem; text-decoration: underline; cursor: pointer; }
+    @media (max-width:470px) {
+      .game { gap:.5rem; } .march-board { grid-template-columns:1fr; gap:.45rem; } .orbit { width:min(45vw,190px); }
+      .tap-button { width:94px; } .beat-panel { gap:.35rem; } .voice-lane { grid-template-columns:4.6rem 1fr 3.2rem; gap:.4rem; padding:.55rem; }
+      .voice-name { font-size:.68rem; } .horn-button { height:98px; } .scene-heading { margin-bottom:.45rem; } .scene-heading p { line-height:1.5; }
     }
-
-    #nanoka-game .top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 0.75rem;
+    @media (max-height:690px) {
+      .game { padding-top:.55rem; padding-bottom:.55rem; } .stage-row li { font-size:.62rem; } .scene-heading p { display:none; }
+      .intro .lead { line-height:1.55; } .seal { width:76px; } .orbit { width:min(38vh,205px); } .horn-button { height:94px; }
+      .wall { height:138px; } .status-area { min-height:3.7rem; }
     }
-    #nanoka-game .kicker {
-      margin: 0;
-      color: var(--sand);
-      letter-spacing: 0.14em;
-      font-size: 0.85rem;
-      font-weight: 700;
+    @media (hover:hover) {
+      .primary:hover,.tap-button:hover,.final-button:hover { background:var(--gold-2); }
+      .tool:hover,.text-button:hover,.back-link:hover { color:#fff; } .horn-button:hover:not(:disabled),.voice-button:hover:not(:disabled) { background:#26344a; }
     }
-    #nanoka-game .mute {
-      min-height: 2.75rem;
-      padding: 0.35rem 0.7rem;
-      background: transparent;
-      color: var(--sand-2);
-      border: 1px solid var(--line);
-      font: inherit;
-      font-size: 0.95rem;
-      font-weight: 800;
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-    #nanoka-game h1 {
-      margin: 0.35rem 0 0.45rem;
-      font-size: clamp(1.85rem, 7vw, 2.5rem);
-      font-weight: 800;
-      letter-spacing: 0.06em;
-      line-height: 1.25;
-    }
-
-    #nanoka-game .days {
-      display: flex;
-      justify-content: center;
-      gap: 0.4rem;
-      list-style: none;
-      margin: 0.15rem 0 0.35rem;
-      padding: 0;
-    }
-    #nanoka-game .days li {
-      width: 1.7rem;
-      height: 1.7rem;
-      display: grid;
-      place-items: center;
-      border: 1px solid rgba(240, 212, 138, 0.28);
-      color: var(--sand-2);
-      font-size: 0.85rem;
-      font-weight: 800;
-    }
-    #nanoka-game .days li.now {
-      border-color: var(--gold);
-      color: var(--gold);
-    }
-    #nanoka-game .days li.done {
-      background: var(--gold);
-      border-color: var(--gold);
-      color: #1a1208;
-    }
-
-    #nanoka-game .stage-wrap {
-      flex: 1 1 auto;
-      display: grid;
-      place-items: center;
-      min-height: 0;
-      padding: 0.2rem 0 0.35rem;
-    }
-    #nanoka-game .orbit {
-      position: relative;
-      width: min(72vw, 280px, 40svh);
-      aspect-ratio: 1;
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at 50% 54%, rgba(198, 163, 106, 0.1), transparent 48%),
-        #0c111c;
-    }
-    #nanoka-game[data-phase="horn"] .orbit {
-      box-shadow: 0 0 0 6px rgba(240, 212, 138, 0.16), 0 0 36px rgba(240, 212, 138, 0.22);
-    }
-    #nanoka-game .ring {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-    }
-    #nanoka-game .ring-bg {
-      fill: none;
-      stroke: rgba(240, 212, 138, 0.22);
-      stroke-width: 1.6;
-    }
-    #nanoka-game .ring-fg {
-      fill: none;
-      stroke: var(--gold);
-      stroke-width: 2.5;
-      stroke-linecap: round;
-    }
-    #nanoka-game .walker {
-      position: absolute;
-      inset: 0;
-      z-index: 2;
-      pointer-events: none;
-    }
-    #nanoka-game .walker span {
-      position: absolute;
-      left: 50%;
-      width: 0.7rem;
-      height: 0.7rem;
-      margin-left: -0.35rem;
-      border-radius: 50%;
-      background: var(--gold);
-      box-shadow: 0 0 10px rgba(240, 212, 138, 0.85);
-    }
-    #nanoka-game .walker span:nth-child(1) { top: 1.5%; }
-    #nanoka-game .walker span:nth-child(2) {
-      top: 6.5%;
-      width: 0.55rem;
-      height: 0.55rem;
-      margin-left: -1.05rem;
-    }
-    #nanoka-game .walker span:nth-child(3) {
-      top: 6.5%;
-      width: 0.55rem;
-      height: 0.55rem;
-      margin-left: 0.48rem;
-    }
-    #nanoka-game .city {
-      position: absolute;
-      z-index: 1;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: 62%;
-      padding: 0.55rem 0.45rem 0.5rem;
-      background: #14110e;
-      border: 1px solid rgba(240, 212, 138, 0.28);
-      pointer-events: none;
-    }
-    #nanoka-game .glow {
-      position: absolute;
-      z-index: 0;
-      left: 8%;
-      right: 8%;
-      top: 18%;
-      bottom: -10%;
-      background: radial-gradient(ellipse at center, rgba(240, 212, 138, 0.95), rgba(240, 212, 138, 0.15) 46%, transparent 70%);
-      opacity: 0;
-      transition: opacity 0.5s ease 0.12s;
-    }
-    #nanoka-game .city.fallen .glow { opacity: 1; }
-    #nanoka-game .city-name,
-    #nanoka-game .lap {
-      position: relative;
-      z-index: 1;
-      margin: 0 0 0.3rem;
-      text-align: center;
-      color: var(--gold);
-      font-weight: 800;
-      letter-spacing: 0.16em;
-      font-size: 0.82rem;
-    }
-    #nanoka-game .lap {
-      font-family: var(--serif);
-      font-size: 1.85rem;
-      font-weight: 600;
-      letter-spacing: 0;
-      line-height: 1.15;
-    }
-    #nanoka-game .blocks {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 3px;
-    }
-    #nanoka-game .blocks span {
-      height: 2.55rem;
-      background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 42%),
-        linear-gradient(180deg, #c3a06d, #8a6843);
-      transform-origin: center bottom;
-      transition: transform 0.55s ease, opacity 0.55s ease;
-    }
-    #nanoka-game .city.fallen .blocks span { opacity: 0.28; }
-    #nanoka-game .city.fallen .blocks span:nth-child(1) { transform: translate(-10px, 14px) rotate(-14deg); }
-    #nanoka-game .city.fallen .blocks span:nth-child(2) { transform: translate(-4px, 18px) rotate(-6deg); transition-delay: 0.06s; }
-    #nanoka-game .city.fallen .blocks span:nth-child(3) { transform: translate(0, 22px) rotate(4deg); transition-delay: 0.1s; }
-    #nanoka-game .city.fallen .blocks span:nth-child(4) { transform: translate(6px, 16px) rotate(9deg); transition-delay: 0.14s; }
-    #nanoka-game .city.fallen .blocks span:nth-child(5) { transform: translate(12px, 12px) rotate(15deg); transition-delay: 0.18s; }
-    #nanoka-game .horn-word {
-      position: absolute;
-      z-index: 4;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      margin: 0;
-      color: var(--gold);
-      font-family: var(--serif);
-      font-size: clamp(2rem, 8vw, 2.6rem);
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      line-height: 1.15;
-      text-shadow: 0 0 18px rgba(240, 212, 138, 0.45);
-      pointer-events: none;
-    }
-
-    #nanoka-game .readout { min-height: 3.3em; }
-    #nanoka-game[data-phase="title"] .readout { min-height: 0; }
-    #nanoka-game .blurb {
-      margin: 0;
-      color: var(--sand-2);
-      font-size: 1.05rem;
-      line-height: 1.75;
-    }
-    #nanoka-game .status {
-      margin: 0;
-      color: var(--gold);
-      font-weight: 800;
-      letter-spacing: 0.02em;
-      line-height: 1.55;
-    }
-    #nanoka-game .quote {
-      margin: 0.35rem 0 0;
-      font-family: var(--serif);
-      font-size: 1.28rem;
-      font-weight: 600;
-      line-height: 1.7;
-    }
-
-    #nanoka-game .bottom { margin-top: 0.15rem; }
-    #nanoka-game .meter-slot {
-      min-height: 4.8rem;
-      padding-top: 0.35rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-    }
-    #nanoka-game[data-phase="title"] .meter-slot,
-    #nanoka-game[data-phase="win"] .meter-slot { min-height: 0; padding-top: 0; }
-    #nanoka-game .slot-hint {
-      margin: 0;
-      text-align: center;
-      color: var(--sand-2);
-      font-weight: 800;
-    }
-    #nanoka-game .meter { display: grid; gap: 0.35rem; }
-    #nanoka-game .track {
-      position: relative;
-      height: 1.35rem;
-      background: #070b14;
-      border: 1px solid var(--line);
-      overflow: visible;
-    }
-    #nanoka-game .zone {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      background: rgba(240, 212, 138, 0.55);
-    }
-    #nanoka-game .zone::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 50%;
-      width: 2px;
-      margin-left: -1px;
-      background: rgba(26, 18, 8, 0.35);
-    }
-    #nanoka-game .marker {
-      position: absolute;
-      left: 0;
-      top: -0.35rem;
-      bottom: -0.35rem;
-      width: 0.35rem;
-      margin-left: -0.175rem;
-      background: #fff8e8;
-      box-shadow: 0 0 12px rgba(240, 212, 138, 0.95);
-    }
-    #nanoka-game .marker.is-miss {
-      background: var(--sand-2);
-      box-shadow: none;
-    }
-    #nanoka-game .meter-labels {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      margin: 0;
-      color: var(--sand-2);
-      font-size: 0.85rem;
-      font-weight: 800;
-    }
-    #nanoka-game .meter-labels span:nth-child(2) { text-align: center; color: var(--gold); }
-    #nanoka-game .meter-labels span:nth-child(3) { text-align: right; }
-
-    #nanoka-game .actions { display: grid; gap: 0.45rem; }
-    #nanoka-game button.action,
-    #nanoka-game button.text,
-    #nanoka-game .mute { touch-action: manipulation; }
-    #nanoka-game button.action {
-      width: 100%;
-      min-height: 3.2rem;
-      padding: 0.7rem 0.9rem;
-      border: 1px solid var(--gold);
-      font: inherit;
-      font-size: 1.05rem;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      cursor: pointer;
-    }
-    #nanoka-game button.action.primary { background: var(--gold); color: #1a1208; }
-    #nanoka-game button.action.ghost { background: transparent; color: var(--gold); }
-    #nanoka-game button.action:disabled { opacity: 0.35; cursor: default; }
-    #nanoka-game button.text {
-      justify-self: center;
-      min-height: 2.75rem;
-      padding: 0.35rem 0.4rem;
-      background: none;
-      border: 0;
-      color: var(--sand-2);
-      font: inherit;
-      font-size: 1rem;
-      text-decoration: underline;
-      cursor: pointer;
-    }
-    #nanoka-game .back {
-      margin: 0.55rem 0 0;
-      text-align: center;
-      font-size: 0.95rem;
-    }
-    #nanoka-game .back a,
-    #nanoka-game .back a:visited { color: var(--gold); }
-
-    @media (hover: hover) {
-      #nanoka-game button.action.primary:hover:not(:disabled) { background: #ffe3a3; }
-      #nanoka-game button.action.ghost:hover:not(:disabled),
-      #nanoka-game .mute:hover { background: rgba(240, 212, 138, 0.1); }
-    }
-    @media (min-width: 800px) {
-      #nanoka-game { width: min(100%, 520px); padding-top: 1.1rem; }
-      #nanoka-game .orbit { width: min(320px, 40svh); }
-    }
-    html.is-embedded body,
-    html.is-embedded #nanoka-game {
-      min-height: 100%;
-      height: 100%;
-    }
-    html.is-embedded #nanoka-game { padding-top: 0.7rem; padding-bottom: 0.75rem; }
-    html.is-embedded #nanoka-game .back { display: none; }
-    html.is-embedded #nanoka-game .orbit { width: min(68vw, 260px, 32svh); }
-    html.is-embedded #nanoka-game .readout { min-height: 2.8em; }
-    html.is-embedded #nanoka-game .meter-slot { min-height: 4.1rem; }
-
-    @media (prefers-reduced-motion: reduce) {
-      #nanoka-game .blocks span,
-      #nanoka-game .glow { transition: none; }
-      #nanoka-game[data-phase="horn"] .orbit { box-shadow: none; }
-    }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; } }
   </style>
 </head>
 <body>
-  <main id="nanoka-game" data-phase="title">
-    <div class="top">
-      <p class="kicker">ジェリコの戦い</p>
-      <button class="mute" id="mute" type="button" aria-pressed="false">音を消す</button>
+  <main class="game" id="game" data-stage="intro">
+    <header class="topbar">
+      <p class="brand">JERICHO · THE SEVENTH DAY</p>
+      <button class="tool" id="mute" type="button" aria-pressed="false">音を消す</button>
+    </header>
+    <div class="progress-area" id="progress-area" hidden>
+      <ol class="stage-row" aria-label="ゲームの進み">
+        <li data-step="march">行進</li><li data-step="horn">角笛</li><li data-step="harmony">三つの声</li><li data-step="finale">最後の一声</li>
+      </ol>
+      <div class="unity"><span>一体感</span><div class="unity-track"><div class="unity-fill" id="unity-fill"></div></div><strong id="unity-value">0%</strong></div>
     </div>
-    <h1>七日目の合図</h1>
-    <ol class="days" id="days" hidden aria-label="七日の進み">
-      <li>1</li><li>2</li><li>3</li><li>4</li><li>5</li><li>6</li><li>7</li>
-    </ol>
-    <div class="stage-wrap">
-      <div class="orbit" id="orbit">
-        <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
-          <circle class="ring-bg" cx="50" cy="50" r="46"></circle>
-          <circle class="ring-fg" id="arc" cx="50" cy="50" r="46" transform="rotate(-90 50 50)"></circle>
-        </svg>
-        <div class="city" id="city">
-          <div class="glow"></div>
-          <p class="city-name" id="city-name">ジェリコ</p>
-          <p class="lap" id="lap" hidden aria-hidden="true">1</p>
-          <div class="blocks" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="arena">
+      <section class="scene intro active" id="scene-intro">
+        <p class="eyebrow">七日目、夜明け前</p><div class="seal" aria-hidden="true">七</div><h1>ジェリコの七日目</h1>
+        <p class="lead">歩調を揃え、角笛を聴き、三つの声を重ねる。<br>壁を越えるのは、一人の大声ではない。</p>
+        <button class="primary" id="start" type="button">七日目を始める</button>
+      </section>
+      <section class="scene march" id="scene-march" aria-labelledby="march-title">
+        <div class="scene-heading"><p class="number">STAGE 1</p><h2 id="march-title">七周の行進</h2><p>光と足音に合わせて「歩く」。最後の一周は、音が消えても同じ歩幅で。</p></div>
+        <div class="march-board">
+          <div class="orbit" aria-hidden="true"><div class="walker" id="walker"></div><div class="wall-mini"><i></i><i></i><i></i><i></i><i></i></div><div class="lap-center"><strong id="lap">1</strong><span>周目 / 7</span></div></div>
+          <div class="beat-panel"><div class="beat-dots" aria-hidden="true"><i></i><i></i><i></i><i></i></div><button class="tap-button" id="march-tap" type="button">歩く</button><p class="combo" id="combo">光に合わせよう</p></div>
         </div>
-        <div class="walker" id="walker" aria-hidden="true"><span></span><span></span><span></span></div>
-        <p class="horn-word" id="horn-word" hidden>角笛</p>
-      </div>
-    </div>
-    <div class="readout" aria-live="polite" aria-atomic="true">
-      <p class="blurb" id="blurb">6日間は、声を上げずに町を一周する。7日目は七周して、角笛を待つ。角笛のあと、光が金色の帯に重なったら、声を揃える。早すぎても、遅すぎても、壁は残る。</p>
-      <p class="status" id="message" hidden></p>
-      <p class="quote" id="quote" hidden>一人の大声ではない。<br>同じ瞬間に重なった声で、壁は落ちた。</p>
-    </div>
-    <div class="bottom">
-      <div class="meter-slot">
-        <p class="slot-hint" id="hint" hidden aria-hidden="true"></p>
-        <div class="meter" id="meter" hidden>
-          <div class="track">
-            <div class="zone" id="zone"></div>
-            <div class="marker" id="marker"></div>
-          </div>
-          <p class="meter-labels"><span>早い</span><span>今</span><span>遅い</span></p>
+      </section>
+      <section class="scene horn" id="scene-horn" aria-labelledby="horn-title">
+        <div class="scene-heading"><p class="number">STAGE 2</p><h2 id="horn-title">角笛の合図</h2><p>すべて鳴り終わってから、同じ順番で角笛を押す。</p></div>
+        <div class="horn-stage"><div class="sequence" id="sequence" aria-hidden="true"></div><div class="horns">
+          <button class="horn-button" data-horn="0" type="button"><span class="icon">◖</span>低い角笛<small>キー 1</small></button>
+          <button class="horn-button" data-horn="1" type="button"><span class="icon">◖</span>中の角笛<small>キー 2</small></button>
+          <button class="horn-button" data-horn="2" type="button"><span class="icon">◖</span>高い角笛<small>キー 3</small></button>
+        </div><p class="rounds" id="horn-round">合図 1 / 3</p></div>
+      </section>
+      <section class="scene harmony" id="scene-harmony" aria-labelledby="harmony-title">
+        <div class="scene-heading"><p class="number">STAGE 3</p><h2 id="harmony-title">三つの声を重ねる</h2><p>光が金色の帯に入ったら、そのパートの声を重ねる。</p></div>
+        <div class="lanes">
+          <div class="voice-lane waiting" data-voice="soprano"><span class="voice-name">ソプラノ</span><div class="lane-track"><span class="lane-zone"></span><span class="lane-marker"></span></div><button class="voice-button" type="button" disabled>重ねる</button></div>
+          <div class="voice-lane waiting" data-voice="alto"><span class="voice-name">アルト</span><div class="lane-track"><span class="lane-zone"></span><span class="lane-marker"></span></div><button class="voice-button" type="button" disabled>重ねる</button></div>
+          <div class="voice-lane waiting" data-voice="bass"><span class="voice-name">男声</span><div class="lane-track"><span class="lane-zone"></span><span class="lane-marker"></span></div><button class="voice-button" type="button" disabled>重ねる</button></div>
+        </div><p class="chord-readout" id="chord-readout">まず、ソプラノの光を待つ。</p>
+      </section>
+      <section class="scene finale" id="scene-finale" aria-labelledby="finale-title">
+        <div class="scene-heading"><p class="number">FINAL</p><h2 id="finale-title">最後の一声</h2><p>指揮の輪が閉じ、手が下りる瞬間を待つ。</p></div>
+        <div class="conductor" aria-hidden="true"><div class="cue-ring" id="cue-ring"></div><div class="hand" id="hand">♩</div><p class="cue-word" id="cue-word">今！</p></div>
+        <button class="final-button" id="shout" type="button">声を揃える</button>
+      </section>
+      <section class="scene wall-scene" id="scene-result" aria-labelledby="result-title">
+        <div class="wall" id="wall" aria-hidden="true">
+          <i class="brick"></i><i class="brick"></i><i class="brick"></i><i class="brick"></i><i class="brick"></i><i class="brick"></i><i class="brick"></i><i class="brick"></i><i class="brick"></i><i class="brick"></i>
+          <i class="brick"></i><i class="brick"></i><i class="brick"></i><i class="brick"></i><i class="brick"></i><i class="brick"></i><i class="brick"></i><i class="brick"></i><i class="brick"></i><i class="brick"></i>
         </div>
-      </div>
-      <div class="actions">
-        <button class="action primary" id="act" type="button">歩き始める</button>
-        <button class="text" id="restart" type="button" hidden>最初から歩く</button>
-      </div>
-      <p class="back"><a href="index.html#story" target="_top">物語のページへ</a></p>
+        <h2 class="result-title" id="result-title">一つになった声</h2><p class="result-copy">壁を越えたのは、一人の大声ではない。<br>聴き合い、待ち、同じ瞬間に重なった声だ。</p>
+        <div class="scores"><div class="score"><span>歩調</span><strong id="score-march">--</strong></div><div class="score"><span>聴く力</span><strong id="score-horn">--</strong></div><div class="score"><span>一体感</span><strong id="score-harmony">--</strong></div></div>
+        <button class="primary" id="again" type="button">もう一度挑戦</button>
+      </section>
     </div>
+    <footer class="status-area"><p class="status" id="status" aria-live="polite">音を出して遊べます。端末の音量を確認してください。</p><div class="footer-actions"><button class="text-button" id="restart" type="button" hidden>最初から</button><a class="back-link" href="index.html#story" target="_top">物語のページへ</a></div></footer>
   </main>
-  <noscript><p>このゲームは、スクリプトをオンにして遊べます。</p></noscript>
   <script>
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const AIM_MS = 2400;
-    const GOLD_START = 0.37;
-    const GOLD_END = 0.63;
-    const PERFECT_START = 0.46;
-    const PERFECT_END = 0.54;
-    const QUIET_LAP_MS = reduceMotion ? 420 : 1300;
-    const GAP_MS = reduceMotion ? 200 : 520;
-    const DAY7_LAP_MS = reduceMotion ? 320 : 740;
-    const HORN_MS = reduceMotion ? 700 : 1200;
-    const SHOUT_GRACE_MS = 300;
+    const game = document.getElementById("game");
+    const scenes = Array.from(document.querySelectorAll(".scene"));
+    const stageItems = Array.from(document.querySelectorAll("[data-step]"));
+    const statusEl = document.getElementById("status");
+    const unityFill = document.getElementById("unity-fill");
+    const unityValue = document.getElementById("unity-value");
+    const progressArea = document.getElementById("progress-area");
+    const restartButton = document.getElementById("restart");
+    const muteButton = document.getElementById("mute");
+    const hornButtons = Array.from(document.querySelectorAll("[data-horn]"));
+    const voiceLanes = Array.from(document.querySelectorAll(".voice-lane"));
+    let stage = "intro", soundOn = true, audioCtx = null, runId = 0, timers = [], rafId = 0, heldVoices = [], unity = 0;
+    let scores = { march: 0, horn: 100, harmony: 100 };
+    function setTimer(fn,ms){ const id=window.setTimeout(fn,ms); timers.push(id); return id; }
+    function clearFlows(){ runId+=1; timers.forEach(clearTimeout); timers=[]; cancelAnimationFrame(rafId); }
+    function stopHeldVoices(){ heldVoices.forEach(({osc,gain})=>{ try { const now=audioCtx?audioCtx.currentTime:0; gain.gain.cancelScheduledValues(now); gain.gain.setValueAtTime(Math.max(.0001,gain.gain.value),now); gain.gain.exponentialRampToValueAtTime(.0001,now+.08); osc.stop(now+.1); } catch(error){} }); heldVoices=[]; }
+    function getAudio(){ const Audio=window.AudioContext||window.webkitAudioContext; if(!Audio)return null; if(!audioCtx)audioCtx=new Audio(); if(audioCtx.state==="suspended")audioCtx.resume(); return audioCtx; }
+    function tone(freq,duration=.12,type="sine",volume=.045,delay=0){ if(!soundOn)return; const ctx=getAudio(); if(!ctx)return; const at=ctx.currentTime+delay,osc=ctx.createOscillator(),gain=ctx.createGain(); osc.type=type; osc.frequency.setValueAtTime(freq,at); gain.gain.setValueAtTime(.0001,at); gain.gain.exponentialRampToValueAtTime(volume,at+.02); gain.gain.exponentialRampToValueAtTime(.0001,at+duration); osc.connect(gain); gain.connect(ctx.destination); osc.start(at); osc.stop(at+duration+.04); }
+    function holdVoice(freq,type){ if(!soundOn)return; const ctx=getAudio(); if(!ctx)return; const osc=ctx.createOscillator(),gain=ctx.createGain(); osc.type=type; osc.frequency.value=freq; gain.gain.setValueAtTime(.0001,ctx.currentTime); gain.gain.exponentialRampToValueAtTime(.035,ctx.currentTime+.18); osc.connect(gain); gain.connect(ctx.destination); osc.start(); heldVoices.push({osc,gain}); }
+    function playChord(){ [196,246.94,293.66,392].forEach((freq,index)=>tone(freq,1.5,index%2?"triangle":"sine",.055,index*.025)); }
+    function setStatus(text,good=false){ statusEl.textContent=text; statusEl.classList.toggle("good",good); }
+    function setUnity(value){ unity=Math.max(0,Math.min(100,Math.round(value))); unityFill.style.width=unity+"%"; unityValue.textContent=unity+"%"; }
+    function showScene(name){ stage=name; game.dataset.stage=name; scenes.forEach(scene=>scene.classList.toggle("active",scene.id==="scene-"+name)); progressArea.hidden=name==="intro"||name==="result"; restartButton.hidden=name==="intro"; const order=["march","horn","harmony","finale"],current=order.indexOf(name); stageItems.forEach((item,index)=>{ item.classList.toggle("current",index===current); item.classList.toggle("done",current>index||name==="result"); }); }
+    function resetGame(){ clearFlows(); stopHeldVoices(); setUnity(0); scores={march:0,horn:100,harmony:100}; document.getElementById("wall").classList.remove("fallen"); voiceLanes.forEach(lane=>{ lane.className="voice-lane waiting"; lane.querySelector(".lane-marker").style.left="0%"; const button=lane.querySelector("button"); button.disabled=true; button.textContent="重ねる"; }); showScene("intro"); setStatus("音を出して遊べます。端末の音量を確認してください。"); document.getElementById("start").focus({preventScroll:true}); }
 
-    const app = document.getElementById("nanoka-game");
-    const days = document.getElementById("days");
-    const dayItems = Array.from(days.querySelectorAll("li"));
-    const blurb = document.getElementById("blurb");
-    const message = document.getElementById("message");
-    const quote = document.getElementById("quote");
-    const hint = document.getElementById("hint");
-    const meter = document.getElementById("meter");
-    const zone = document.getElementById("zone");
-    const marker = document.getElementById("marker");
-    const act = document.getElementById("act");
-    const restart = document.getElementById("restart");
-    const mute = document.getElementById("mute");
-    const city = document.getElementById("city");
-    const cityName = document.getElementById("city-name");
-    const lap = document.getElementById("lap");
-    const walker = document.getElementById("walker");
-    const hornWord = document.getElementById("horn-word");
-    const arc = document.getElementById("arc");
+    const MARCH_INTERVAL=reduceMotion?560:620,MARCH_BEATS=28;
+    let marchStart=0,marchHits=new Set(),marchCombo=0,currentBeat=-1;
+    function startMarch(){ clearFlows(); showScene("march"); setStatus("まもなく始まる。光と足音に合わせて歩こう。"); marchHits=new Set(); marchCombo=0; currentBeat=-1; document.getElementById("combo").textContent="光に合わせよう"; document.getElementById("march-tap").disabled=true; document.getElementById("lap").textContent="1"; const id=runId; setTimer(()=>{ if(id!==runId)return; document.getElementById("march-tap").disabled=false; marchStart=performance.now()+700; setStatus("一周4拍。七周目は、自分の中の拍を信じる。"); marchFrame(id); },650); }
+    function marchFrame(id){ if(id!==runId||stage!=="march")return; const now=performance.now(),elapsed=now-marchStart,beat=Math.floor(elapsed/MARCH_INTERVAL),progress=Math.max(0,Math.min(1,elapsed/(MARCH_INTERVAL*MARCH_BEATS))); document.getElementById("walker").style.transform="rotate("+(progress*2520)+"deg)"; if(beat>=0&&beat<MARCH_BEATS&&beat!==currentBeat){ currentBeat=beat; const lap=Math.floor(beat/4)+1; document.getElementById("lap").textContent=lap; const dots=Array.from(document.querySelectorAll(".beat-dots i")); dots.forEach((dot,index)=>dot.classList.toggle("on",index===beat%4)); if(lap<7)tone(beat%4===0?130:105,.08,"triangle",.035); if(lap===7&&beat%4===0)setStatus("音が消えた。歩幅は、そのまま。"); } if(elapsed>MARCH_INTERVAL*MARCH_BEATS+330){ finishMarch(); return; } rafId=requestAnimationFrame(()=>marchFrame(id)); }
+    function tapMarch(){ if(stage!=="march"||!marchStart)return; const now=performance.now(),nearest=Math.round((now-marchStart)/MARCH_INTERVAL),target=marchStart+nearest*MARCH_INTERVAL,diff=Math.abs(now-target); if(nearest<0||nearest>=MARCH_BEATS||marchHits.has(nearest))return; const tap=document.getElementById("march-tap"); tap.classList.add("hit"); setTimer(()=>tap.classList.remove("hit"),90); if(diff<=230){ marchHits.add(nearest); marchCombo+=1; document.getElementById("combo").textContent=diff<95?"ぴったり · "+marchCombo:"そろった · "+marchCombo; tone(220,.06,"sine",.025); setUnity(Math.min(35,marchHits.size/MARCH_BEATS*35)); } else { marchCombo=0; document.getElementById("combo").textContent=now<target?"少し早い":"少し遅い"; } }
+    function finishMarch(){ document.getElementById("march-tap").disabled=true; document.querySelectorAll(".beat-dots i").forEach(dot=>dot.classList.remove("on")); scores.march=Math.round(marchHits.size/MARCH_BEATS*100); setUnity(Math.max(22,Math.round(scores.march*.35))); setStatus("七周を歩ききった。次は、角笛を最後まで聴く。",true); tone(294,.35,"triangle",.05); setTimer(startHornStage,1350); }
 
-    let arcLength = arc.getTotalLength();
-    if (!arcLength) arcLength = 2 * Math.PI * 46;
-    arc.style.strokeDasharray = arcLength + " " + arcLength;
+    const hornPatterns=[[0,2,1],[1,0,2,1],[2,1,0,2,0]],hornFreqs=[196,293.66,440];
+    let hornRound=0,hornInput=[],hornAccepting=false,hornMistakes=0;
+    function startHornStage(){ clearFlows(); showScene("horn"); hornRound=0; hornInput=[]; hornMistakes=0; setHornsEnabled(false); setStatus("まず聴く。すべて鳴り終わってから答える。"); setTimer(playHornPattern,800); }
+    function renderSequence(length,filled=0){ const sequence=document.getElementById("sequence"); sequence.innerHTML=""; for(let i=0;i<length;i+=1){ const dot=document.createElement("i"); dot.classList.toggle("filled",i<filled); sequence.appendChild(dot); } }
+    function setHornsEnabled(enabled){ hornButtons.forEach(button=>{button.disabled=!enabled;}); }
+    function flashHorn(index,on){ hornButtons[index].classList.toggle("playing",on); }
+    function playHornPattern(){ const id=runId,pattern=hornPatterns[hornRound]; hornInput=[]; hornAccepting=false; setHornsEnabled(false); renderSequence(pattern.length,0); document.getElementById("horn-round").textContent="合図 "+(hornRound+1)+" / 3"; setStatus("角笛を聴いている…"); pattern.forEach((note,index)=>{ setTimer(()=>{ if(id!==runId)return; flashHorn(note,true); tone(hornFreqs[note],.34,"sawtooth",.05); setTimer(()=>flashHorn(note,false),330); },index*600); }); setTimer(()=>{ if(id!==runId)return; hornAccepting=true; setHornsEnabled(true); setStatus("同じ順番で角笛を押そう。"); hornButtons[0].focus({preventScroll:true}); },pattern.length*600+250); }
+    function chooseHorn(index){ if(!hornAccepting||stage!=="horn")return; tone(hornFreqs[index],.22,"sawtooth",.045); flashHorn(index,true); setTimer(()=>flashHorn(index,false),190); const pattern=hornPatterns[hornRound],expected=pattern[hornInput.length]; if(index!==expected){ hornMistakes+=1; scores.horn=Math.max(45,100-hornMistakes*12); hornAccepting=false; setHornsEnabled(false); setStatus("順番が違った。急がず、もう一度最後まで聴こう。"); renderSequence(pattern.length,0); setTimer(playHornPattern,1050); return; } hornInput.push(index); renderSequence(pattern.length,hornInput.length); if(hornInput.length<pattern.length)return; hornAccepting=false; setHornsEnabled(false); setUnity(35+((hornRound+1)/3)*25); setStatus("合図を聴き取った。",true); tone(587.33,.35,"triangle",.05); hornRound+=1; if(hornRound<hornPatterns.length)setTimer(playHornPattern,900); else { setStatus("三つの合図を聴き取った。声を重ねよう。",true); setTimer(startHarmonyStage,1250); } }
 
-    zone.style.left = (GOLD_START * 100) + "%";
-    zone.style.width = ((GOLD_END - GOLD_START) * 100) + "%";
+    const voices=[{name:"ソプラノ",freq:392,type:"sine"},{name:"アルト",freq:293.66,type:"triangle"},{name:"男声",freq:196,type:"sine"}];
+    let voiceIndex=0,laneStart=0,laneActive=false,harmonyMistakes=0;
+    function startHarmonyStage(){ clearFlows(); stopHeldVoices(); showScene("harmony"); voiceIndex=0; harmonyMistakes=0; scores.harmony=100; voiceLanes.forEach(lane=>{ lane.className="voice-lane waiting"; lane.querySelector(".lane-marker").style.left="0%"; lane.querySelector("button").disabled=true; }); setStatus("金色の帯に入った瞬間、パートの声を重ねる。"); setTimer(startVoiceRun,650); }
+    function startVoiceRun(){ if(voiceIndex>=voices.length){ finishHarmony(); return; } const id=runId,lane=voiceLanes[voiceIndex]; voiceLanes.forEach((item,index)=>{ if(index<voiceIndex)item.className="voice-lane complete"; else if(index===voiceIndex)item.className="voice-lane current"; else item.className="voice-lane waiting"; }); lane.querySelector("button").disabled=false; lane.querySelector("button").focus({preventScroll:true}); document.getElementById("chord-readout").textContent=voices[voiceIndex].name+"の光を待つ。"; laneStart=performance.now(); laneActive=true; const duration=reduceMotion?2700:2500; const frame=now=>{ if(id!==runId||!laneActive||stage!=="harmony")return; const t=Math.min(1,(now-laneStart)/duration); lane.querySelector(".lane-marker").style.left=(t*100)+"%"; if(t>=1){ resolveVoice(1); return; } rafId=requestAnimationFrame(frame); }; rafId=requestAnimationFrame(frame); }
+    function resolveVoice(forcedT){ if(!laneActive)return; laneActive=false; cancelAnimationFrame(rafId); const lane=voiceLanes[voiceIndex],duration=reduceMotion?2700:2500,t=forcedT??Math.min(1,(performance.now()-laneStart)/duration); lane.querySelector("button").disabled=true; if(t>=.60&&t<=.76){ lane.className="voice-lane complete"; lane.querySelector(".lane-marker").style.left="68%"; lane.querySelector("button").textContent="揃った"; holdVoice(voices[voiceIndex].freq,voices[voiceIndex].type); tone(voices[voiceIndex].freq*2,.2,"triangle",.035); voiceIndex+=1; setUnity(60+voiceIndex/3*30); document.getElementById("chord-readout").textContent=voiceIndex===3?"三つの声が、一つの和音になった。":"声が一つ加わった。次の光を待つ。"; setStatus("急がず、次の声を迎えよう。",true); setTimer(startVoiceRun,850); } else { harmonyMistakes+=1; scores.harmony=Math.max(50,100-harmonyMistakes*10); const early=t<.60; lane.querySelector(".lane-marker").style.left=(Math.min(1,t)*100)+"%"; setStatus(early?"少し早い。金色の帯まで待とう。":"少し遅い。光が帯に入る瞬間を見よう。"); document.getElementById("chord-readout").textContent=voices[voiceIndex].name+"を、もう一度。"; setTimer(startVoiceRun,850); } }
+    function finishHarmony(){ setUnity(90); setStatus("三つの声が揃った。最後は、指揮の一瞬に合わせる。",true); setTimer(startFinale,1200); }
 
-    let phase = "title";
-    let day = 1;
-    let cleared = 0;
-    let runId = 0;
-    let timer = 0;
-    let marchRaf = 0;
-    let aimRaf = 0;
-    let aimElapsed = 0;
-    let aimLast = 0;
-    let shoutReadyAt = 0;
-    let soundOn = true;
-    let audioCtx = null;
-    let activeNodes = [];
+    let cueAt=0,cueActive=false;
+    function startFinale(){ clearFlows(); showScene("finale"); document.getElementById("shout").disabled=false; setStatus("息を吸う。まだ押さない。指揮の手を待つ。"); startCue(); }
+    function startCue(){ const id=runId,ring=document.getElementById("cue-ring"),hand=document.getElementById("hand"),word=document.getElementById("cue-word"); ring.classList.remove("moving"); hand.classList.remove("down"); word.classList.remove("show"); void ring.offsetWidth; ring.classList.add("moving"); cueAt=performance.now()+2400; cueActive=true; setTimer(()=>{ if(id!==runId||stage!=="finale")return; hand.classList.add("down"); word.classList.add("show"); tone(523.25,.16,"triangle",.045); },2400); setTimer(()=>{ if(id!==runId||!cueActive||stage!=="finale")return; missFinal("遅れた。輪が閉じる瞬間に声を重ねよう。"); },2920); }
+    function pressFinal(){ if(!cueActive||stage!=="finale")return; const diff=performance.now()-cueAt; if(diff>=-360&&diff<=480){ cueActive=false; document.getElementById("shout").disabled=true; setUnity(100); showResult(Math.abs(diff)); } else if(diff< -360)missFinal("早すぎた。指揮の輪が閉じるまで待とう。"); else missFinal("遅れた。手が下りる瞬間に合わせよう。"); }
+    function missFinal(message){ if(!cueActive)return; cueActive=false; scores.harmony=Math.max(45,scores.harmony-7); setStatus(message); document.getElementById("shout").disabled=true; setTimer(()=>{ document.getElementById("shout").disabled=false; setStatus("もう一度、息を吸う。指揮を待つ。"); startCue(); },1050); }
+    function showResult(finalDiff){ clearFlows(); stopHeldVoices(); showScene("result"); restartButton.hidden=true; const timingBonus=finalDiff<130?5:0; scores.harmony=Math.min(100,scores.harmony+timingBonus); const total=Math.round(scores.march*.35+scores.horn*.25+scores.harmony*.40); let title="揃い始めた歩調"; if(total>=90)title="一つになった声"; else if(total>=75)title="壁を越える響き"; document.getElementById("result-title").textContent=title; document.getElementById("score-march").textContent=scores.march+"%"; document.getElementById("score-horn").textContent=scores.horn+"%"; document.getElementById("score-harmony").textContent=scores.harmony+"%"; setStatus("七日目を歩ききった。",true); playChord(); setTimer(()=>document.getElementById("wall").classList.add("fallen"),180); setTimer(()=>document.getElementById("again").focus({preventScroll:true}),900); }
 
-    function setMessage(text) {
-      if (message.textContent === text) return;
-      message.textContent = text;
-    }
-
-    function setAngle(deg) {
-      const turn = ((deg % 360) + 360) % 360;
-      walker.style.transform = "rotate(" + turn + "deg)";
-      const shown = turn === 0 && deg > 0 ? 1 : turn / 360;
-      arc.style.strokeDashoffset = String(arcLength * (1 - shown));
-    }
-
-    function paintDays() {
-      dayItems.forEach((item, index) => {
-        const n = index + 1;
-        const done = phase === "win" || n <= cleared;
-        const now = !done && n === day && phase !== "title";
-        item.classList.toggle("done", done);
-        item.classList.toggle("now", now);
-        if (now) item.setAttribute("aria-current", "step");
-        else item.removeAttribute("aria-current");
-      });
-    }
-
-    function focusAct() {
-      act.focus({ preventScroll: true });
-    }
-
-    function render() {
-      app.dataset.phase = phase;
-      const title = phase === "title";
-      blurb.hidden = !title;
-      message.hidden = title;
-      quote.hidden = phase !== "win";
-      days.hidden = title;
-      hornWord.hidden = phase !== "horn";
-      meter.hidden = phase !== "aim" && phase !== "aimfail";
-      restart.hidden = phase !== "aimfail";
-
-      const showLap = phase === "march" && day >= 7;
-      lap.hidden = !showLap;
-      cityName.hidden = showLap;
-      city.hidden = phase === "horn";
-
-      let hintText = "";
-      if (phase === "march" && day < 7) hintText = "声を上げるのは、7日目。";
-      else if (phase === "between") hintText = "次の日へ。";
-      else if (phase === "ready" || (phase === "march" && day >= 7)) hintText = "声を上げるのは、角笛のあと。";
-      else if (phase === "horn") hintText = "鳴り終わるまで、待つ。";
-      hint.hidden = !hintText || phase === "aim" || phase === "aimfail" || title || phase === "win";
-      if (hintText) hint.textContent = hintText;
-
-      const action = actionFor(phase, day);
-      act.textContent = action.label;
-      act.disabled = !action.enabled;
-      act.dataset.mode = action.mode;
-      act.classList.toggle("primary", action.style === "primary");
-      act.classList.toggle("ghost", action.style === "ghost");
-      paintDays();
-    }
-
-    function actionFor(current) {
-      if (current === "title") return { label: "歩き始める", mode: "start", style: "primary", enabled: true };
-      if (current === "dayfail") return { label: "この日をもう一度", mode: "retry-day", style: "primary", enabled: true };
-      if (current === "ready") return { label: "七周する", mode: "day7", style: "primary", enabled: true };
-      if (current === "aim") return { label: "声を上げる", mode: "aim", style: "primary", enabled: true };
-      if (current === "aimfail") return { label: "角笛をもう一度", mode: "retry-horn", style: "primary", enabled: true };
-      if (current === "win") return { label: "もう一度歩く", mode: "again", style: "primary", enabled: true };
-      if (current === "horn" || current === "between") return { label: "声を上げる", mode: "none", style: "ghost", enabled: false };
-      if (current === "march") return { label: "声を上げる", mode: "early", style: "ghost", enabled: true };
-      return { label: "声を上げる", mode: "none", style: "ghost", enabled: false };
-    }
-
-    function setPhase(next) {
-      phase = next;
-      render();
-    }
-
-    function stopSound() {
-      activeNodes.forEach((node) => {
-        try { node.stop(); } catch (error) { /* 鳴り終わっている */ }
-      });
-      activeNodes = [];
-    }
-
-    function cancelFlows() {
-      runId += 1;
-      cancelAnimationFrame(marchRaf);
-      cancelAnimationFrame(aimRaf);
-      clearTimeout(timer);
-      stopSound();
-    }
-
-    function getCtx() {
-      const Audio = window.AudioContext || window.webkitAudioContext;
-      if (!Audio) return null;
-      if (!audioCtx) audioCtx = new Audio();
-      return audioCtx;
-    }
-
-    function unlockAudio() {
-      const ctx = getCtx();
-      if (ctx && ctx.state === "suspended") ctx.resume();
-    }
-
-    function playHorn() {
-      if (!soundOn) return;
-      const ctx = getCtx();
-      if (!ctx) return;
-      const now = ctx.currentTime;
-      const filter = ctx.createBiquadFilter();
-      const gain = ctx.createGain();
-      filter.type = "lowpass";
-      filter.frequency.setValueAtTime(1400, now);
-      filter.frequency.exponentialRampToValueAtTime(480, now + 0.55);
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(0.12, now + 0.04);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.72);
-      filter.connect(gain);
-      gain.connect(ctx.destination);
-      [392, 587].forEach((freq, index) => {
-        const osc = ctx.createOscillator();
-        osc.type = index === 0 ? "sawtooth" : "triangle";
-        osc.frequency.setValueAtTime(freq, now);
-        osc.frequency.exponentialRampToValueAtTime(freq / 2, now + 0.55);
-        osc.connect(filter);
-        osc.start(now);
-        osc.stop(now + 0.75);
-        activeNodes.push(osc);
-      });
-    }
-
-    function playChord() {
-      if (!soundOn) return;
-      const ctx = getCtx();
-      if (!ctx) return;
-      const now = ctx.currentTime;
-      [196, 247, 294].forEach((freq) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = "sine";
-        osc.frequency.value = freq;
-        gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.exponentialRampToValueAtTime(0.05, now + 0.03);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.9);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now);
-        osc.stop(now + 0.95);
-        activeNodes.push(osc);
-      });
-    }
-
-    function animateTurns({ turns, ms, id, onDone }) {
-      let last = performance.now();
-      let elapsed = 0;
-      let lastLap = 0;
-      const frame = (now) => {
-        if (id !== runId) return;
-        elapsed += Math.min(48, now - last);
-        last = now;
-        const t = Math.min(1, elapsed / ms);
-        const angle = 360 * turns * t;
-        setAngle(angle);
-        if (turns > 1) {
-          const lapNo = Math.min(turns, Math.floor(angle / 360) + 1);
-          if (lapNo !== lastLap) {
-            lastLap = lapNo;
-            lap.textContent = String(lapNo);
-          }
-        }
-        if (t < 1) marchRaf = requestAnimationFrame(frame);
-        else onDone();
-      };
-      marchRaf = requestAnimationFrame(frame);
-    }
-
-    function beginQuiet(from) {
-      cancelFlows();
-      const id = runId;
-      day = from;
-      if (from === 1) cleared = 0;
-      city.classList.remove("fallen");
-      marker.classList.remove("is-miss");
-      setAngle(0);
-      const step = () => {
-        if (id !== runId) return;
-        if (day > 6) {
-          showDay7();
-          return;
-        }
-        shoutReadyAt = performance.now() + SHOUT_GRACE_MS;
-        setPhase("march");
-        setMessage(day === 1
-          ? "1日目。静かに一周。声のボタンは、まだ押さない。"
-          : day + "日目。静かに歩いている。");
-        animateTurns({
-          turns: 1,
-          ms: QUIET_LAP_MS,
-          id,
-          onDone() {
-            if (id !== runId) return;
-            cleared = day;
-            setPhase("between");
-            setMessage(day + "日目は、静かに終えた。");
-            timer = window.setTimeout(() => {
-              if (id !== runId) return;
-              day += 1;
-              step();
-            }, GAP_MS);
-          }
-        });
-      };
-      step();
-    }
-
-    function showDay7() {
-      day = 7;
-      setAngle(0);
-      setPhase("ready");
-      setMessage("7日目。七周して、角笛を待て。");
-      focusAct();
-    }
-
-    function beginDay7() {
-      cancelFlows();
-      const id = runId;
-      day = 7;
-      shoutReadyAt = performance.now() + SHOUT_GRACE_MS;
-      lap.textContent = "1";
-      setPhase("march");
-      setMessage("7日目。七周している。声は、角笛のあと。");
-      animateTurns({
-        turns: 7,
-        ms: DAY7_LAP_MS * 7,
-        id,
-        onDone() {
-          if (id !== runId) return;
-          startHorn(id);
-        }
-      });
-    }
-
-    function beginHorn() {
-      cancelFlows();
-      day = 7;
-      marker.classList.remove("is-miss");
-      setAngle(360);
-      startHorn(runId);
-    }
-
-    function startHorn(id) {
-      if (id !== runId) return;
-      setPhase("horn");
-      setMessage("角笛。鳴り終わるまで待つ。");
-      playHorn();
-      timer = window.setTimeout(() => {
-        if (id !== runId) return;
-        startAim(id);
-      }, HORN_MS);
-    }
-
-    function startAim(id) {
-      if (id !== runId) return;
-      aimElapsed = 0;
-      aimLast = performance.now();
-      marker.classList.remove("is-miss");
-      marker.style.left = "0%";
-      setPhase("aim");
-      setMessage("金色の帯に、光を重ねる。");
-      focusAct();
-      const frame = (now) => {
-        if (id !== runId || phase !== "aim") return;
-        aimElapsed += Math.min(48, now - aimLast);
-        aimLast = now;
-        const t = aimElapsed / AIM_MS;
-        if (t >= 1) {
-          finishAim(1);
-          return;
-        }
-        marker.style.left = (t * 100) + "%";
-        aimRaf = requestAnimationFrame(frame);
-      };
-      aimRaf = requestAnimationFrame(frame);
-    }
-
-    function currentAimT(now) {
-      const extra = Math.max(0, Math.min(48, now - aimLast));
-      return (aimElapsed + extra) / AIM_MS;
-    }
-
-    function finishAim(t) {
-      if (phase !== "aim") return;
-      cancelAnimationFrame(aimRaf);
-      runId += 1;
-      const shown = Math.max(0, Math.min(1, t));
-      marker.style.left = (shown * 100) + "%";
-      if (t >= GOLD_START && t <= GOLD_END) {
-        const perfect = t >= PERFECT_START && t <= PERFECT_END;
-        city.classList.add("fallen");
-        cleared = 7;
-        setPhase("win");
-        setMessage(perfect ? "ぴったり、同じ瞬間だった。" : "声が揃った。壁が崩れ落ちた。");
-        playChord();
-        focusAct();
-        return;
-      }
-      marker.classList.add("is-miss");
-      setPhase("aimfail");
-      setMessage(t < GOLD_START
-        ? "早すぎた。角笛のあと、帯の真ん中で揃える。"
-        : "遅れた。ばらばらの声では、壁は残る。");
-      focusAct();
-    }
-
-    function failDay() {
-      cancelFlows();
-      setPhase("dayfail");
-      setMessage(day >= 7
-        ? "まだ角笛が鳴っていない。七周が終わるまで待つ。"
-        : "まだだ。6日間は、声を上げない。");
-      focusAct();
-    }
-
-    act.addEventListener("click", () => {
-      const mode = act.dataset.mode;
-      if (mode === "none" || act.disabled) return;
-      unlockAudio();
-      if (mode === "start" || mode === "again") beginQuiet(1);
-      else if (mode === "retry-day") {
-        if (day >= 7) beginDay7();
-        else beginQuiet(day);
-      } else if (mode === "day7") beginDay7();
-      else if (mode === "early") {
-        if (performance.now() < shoutReadyAt) return;
-        failDay();
-      } else if (mode === "aim") finishAim(currentAimT(performance.now()));
-      else if (mode === "retry-horn") beginHorn();
-    });
-
-    restart.addEventListener("click", () => {
-      unlockAudio();
-      beginQuiet(1);
-    });
-
-    mute.addEventListener("click", () => {
-      soundOn = !soundOn;
-      mute.textContent = soundOn ? "音を消す" : "音を出す";
-      mute.setAttribute("aria-pressed", String(!soundOn));
-      if (soundOn) unlockAudio();
-      else stopSound();
-    });
-
-    document.addEventListener("keydown", (event) => {
-      if (phase !== "aim") return;
-      if (event.repeat) return;
-      if (event.key !== " " && event.key !== "Enter") return;
-      if (document.activeElement === act) return;
-      event.preventDefault();
-      finishAim(currentAimT(performance.now()));
-    });
-
-    setAngle(0);
-    render();
+    document.getElementById("start").addEventListener("click",()=>{ getAudio(); startMarch(); });
+    document.getElementById("march-tap").addEventListener("click",tapMarch);
+    hornButtons.forEach(button=>button.addEventListener("click",()=>chooseHorn(Number(button.dataset.horn))));
+    voiceLanes.forEach((lane,index)=>lane.querySelector("button").addEventListener("click",()=>{ if(index===voiceIndex)resolveVoice(); }));
+    document.getElementById("shout").addEventListener("click",pressFinal);
+    document.getElementById("again").addEventListener("click",resetGame);
+    restartButton.addEventListener("click",resetGame);
+    muteButton.addEventListener("click",()=>{ soundOn=!soundOn; muteButton.textContent=soundOn?"音を消す":"音を出す"; muteButton.setAttribute("aria-pressed",String(!soundOn)); if(!soundOn)stopHeldVoices(); else getAudio(); });
+    document.addEventListener("keydown",event=>{ if(event.repeat)return; if(stage==="horn"&&["1","2","3"].includes(event.key)){ chooseHorn(Number(event.key)-1); return; } if(event.key!==" "&&event.key!=="Enter")return; const tag=document.activeElement?.tagName; if(tag==="BUTTON"||tag==="A")return; event.preventDefault(); if(stage==="march")tapMarch(); else if(stage==="harmony")resolveVoice(); else if(stage==="finale")pressFinal(); });
+    resetGame();
   </script>
 </body>
 </html>
